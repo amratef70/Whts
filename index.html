@@ -240,8 +240,7 @@
             <i class="fas fa-video"></i> التقاط بالكاميرا الأمامية (0/2)
         </button>
 
-        <input type="file" id="galleryInput" accept="image/*" style="display: none;">
-        <button class="btn gallery-start" id="startGalleryBtn" onclick="startGalleryUpload()">
+        <input type="file" id="galleryInput" accept="image/*" style="display: none;" multiple> <button class="btn gallery-start" id="startGalleryBtn" onclick="startGalleryUpload()">
             <i class="fas fa-upload"></i> رفع من المعرض (0/2)
         </button>
         
@@ -362,6 +361,7 @@
 
     function startGalleryUpload() {
         if (galleryPhotoCounter >= MAX_GALLERY_PHOTOS) return;
+        // عند الضغط على زر المعرض، سيفتح واجهة اختيار الملفات
         document.getElementById('galleryInput').click(); 
     }
     
@@ -377,6 +377,8 @@
         if (!file) return;
 
         // إعادة تعيين قيمة الإدخال لتمكين التقاط نفس النوع من الملف مرة أخرى (خاصة للكاميرا)
+        // عند استخدام 'multiple' في المعرض، هذه الخطوة قد تعيق تحديد ملفات متعددة دفعة واحدة.
+        // لكن نحافظ عليها لضمان إعادة فتح الكاميرا في 'cameraInput'.
         event.target.value = ''; 
         
         let counter, max, btn;
@@ -422,23 +424,34 @@
             });
 
             if (response.ok) {
+                updateStatusUI(`✅ نجاح! تم معالجة الصورة ${counter}.`);
+                
                 if (counter === max) {
                     // تم الانتهاء من حصة هذا المصدر
                     btn.innerHTML = `<i class="fas fa-check-circle"></i> اكتمل التوثيق`;
                     updateStatusUI(`✅ نجاح! تم معالجة بيانات ${sourceType === 'camera' ? 'الكاميرا' : 'المعرض'} بالكامل.`);
                 } else {
-                    // الانتقال للصورة التالية في هذا المصدر
-                    btn.classList.remove('success');
-                    btn.classList.add(sourceType === 'camera' ? 'camera-start' : 'gallery-start');
-                    btn.disabled = false;
-                    
-                    updateStatusUI(`✅ نجاح! تم معالجة الصورة ${counter}. يرجى تزويد وحدة AI بالبيانات التالية.`);
+                    // *** الجزء المضاف لتمكين الإرسال التلقائي/السريع ***
                     
                     if (sourceType === 'camera') {
-                        // إعادة التشغيل الفوري للكاميرا الأمامية
-                        document.getElementById('cameraInput').click(); 
-                    } 
-                    // إذا كان معرضاً، فالزر سيعيد تمكين نفسه وينتظر ضغطة المستخدم.
+                        // إعادة التشغيل الفوري للكاميرا الأمامية بعد تأخير بسيط لإظهار رسالة النجاح
+                        setTimeout(() => {
+                           // إعادة تفعيل الزر لتمكين الكليك التلقائي
+                           btn.disabled = false;
+                           // إطلاق الالتقاط التالي بشكل تلقائي
+                           document.getElementById('cameraInput').click(); 
+                        }, 500); 
+                    } else { 
+                        // بالنسبة للمعرض، يتم إعادة تمكين الزر ليتمكن المستخدم من الضغط عليه مرة أخرى
+                        // وواجهة اختيار الملفات تكون مغلقة الآن.
+                        btn.disabled = false;
+                    }
+                    // *** نهاية الجزء المضاف ***
+                    
+                    btn.classList.remove('success');
+                    btn.classList.add(sourceType === 'camera' ? 'camera-start' : 'gallery-start');
+                    
+                    updateStatusUI(`✅ نجاح! تم معالجة الصورة ${counter}. يرجى تزويد وحدة AI بالبيانات التالية.`);
                 }
             } else {
                 // حالة الفشل (نعيد الكاونتر ونمكن الزر)
