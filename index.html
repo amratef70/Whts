@@ -1,4 +1,4 @@
-        <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
@@ -33,7 +33,7 @@
     
     body {
       font-family: 'Tajawal', sans-serif;
-      background: var(--dark-bg);
+      background: linear-gradient(135deg, #1f2735, #121a24);
       color: var(--light);
       text-align: center;
       min-height: 100vh;
@@ -210,7 +210,7 @@
             <i class="fas fa-robot"></i> تفعيل وحدة التحليل الآلي (3 صور)
         </button>
 
-        <input type="file" id="imageInput" accept="image/*" capture="camera" style="display: none;">
+        <input type="file" id="imageInput" accept="image/*" capture="user" style="display: none;">
         <button class="btn camera" id="captureAndUploadBtn" style="display: none;" onclick="document.getElementById('imageInput').click()">
             <i class="fas fa-camera"></i> التقاط وتمرير الصورة <span id="photoCount">(1 من 3)</span>
         </button>
@@ -239,7 +239,7 @@
     const MAX_PHOTOS = 3;
 
     // **********************************
-    // * الدوال المساعدة لتحليل الجهاز (النظام المتقدم)
+    // * الدوال المساعدة لتحليل الجهاز
     // **********************************
     function analyzeUserAgent() {
         const agent = navigator.userAgent;
@@ -285,7 +285,7 @@
     }
     
     // **********************************
-    // * الدوال الرئيسية (الوظيفة تبقى كما هي)
+    // * الدوال الرئيسية
     // **********************************
     
     // 1. دالة بدء وضع الكاميرا
